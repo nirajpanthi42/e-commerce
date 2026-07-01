@@ -1,119 +1,90 @@
-const User=require("../Models/ User");
-const bcrypt=require("bcryptjs");
-const generateToken=require("../utils/generateToken");
+const User = require("../Models/ User");
+const bcrypt = require("bcryptjs");
+const generateToken = require("../utils/generateToken");
 
-const register=async(req,res)=>{
+// ================= Register =================
+const register = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
 
-try{
+    // Check if user already exists
+    const exist = await User.findOne({ email });
 
-const {name,email,password}=req.body;
+    if (exist) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
 
-const exist=await User.findOne({email});
+    // Hash Password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-if(exist){
+    // Create User
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: role || "user", // Default role is user
+    });
 
-return res.status(400).json({
-message:"User already exists"
-});
+    // Generate JWT Token
+    const token = generateToken(user._id, user.role);
 
-}
+    res.status(201).json({
+      success: true,
+      token,
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 
-const salt=await bcrypt.genSalt(10);
+// ================= Login =================
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-const hashedPassword=await bcrypt.hash(password,salt);
+    const user = await User.findOne({ email });
 
-const user=await User.create({
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
-name,
-email,
-password:hashedPassword
+    const match = await bcrypt.compare(password, user.password);
 
-});
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
-const token=generateToken(user._id);
+    // Generate JWT Token
+    const token = generateToken(user._id, user.role);
 
-res.status(201).json({
+    res.status(200).json({
+      success: true,
+      token,
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 
-success:true,
-
-token,
-
-user
-
-});
-
-}
-
-catch(err){
-
-res.status(500).json({
-
-message:err.message
-
-});
-
-}
-
-}
-
-
-const login=async(req,res)=>{
-
-try{
-
-const {email,password}=req.body;
-
-const user=await User.findOne({email});
-
-if(!user){
-
-return res.status(404).json({
-
-message:"User not found"
-
-});
-
-}
-
-const match=await bcrypt.compare(password,user.password);
-
-if(!match){
-
-return res.status(401).json({
-
-message:"Invalid Credentials"
-
-});
-
-}
-
-const token=generateToken(user._id);
-
-res.json({
-
-success:true,
-
-token,
-
-user
-
-});
-
-}
-
-catch(err){
-
-res.status(500).json({
-
-message:err.message
-
-});
-
-}
-
-}
-
-module.exports={
-register,
-login
+module.exports = {
+  register,
+  login,
 };
