@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 
 const connectDB = require("./Config/db");
-
+const cloudinary = require("./Config/cloudinary");
 // Routes
 
 const productRoutes=require("./Routes/Product")

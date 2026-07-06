@@ -13,6 +13,9 @@ const {
   restrictTo,
 } = require("../middleware/authMiddleware");
 
+// Import upload middleware
+const upload = require("../middleware/upload");
+
 const router = express.Router();
 
 // ================= Public Routes =================
@@ -26,12 +29,29 @@ router.get("/:id", getProductById);
 // ================= Admin Routes =================
 
 // Create Product (Admin Only)
-router.post("/", protect, restrictTo("admin"), createProduct);
+router.post(
+  "/",
+  protect,
+  restrictTo("admin"),
+  upload.single("image"), // <-- Upload image to Cloudinary
+  createProduct
+);
 
 // Update Product (Admin Only)
-router.put("/:id", protect, restrictTo("admin"), updateProduct);
+router.put(
+  "/:id",
+  protect,
+  restrictTo("admin"),
+  upload.single("image"), // <-- Optional: update image
+  updateProduct
+);
 
 // Delete Product (Admin Only)
-router.delete("/:id", protect, restrictTo("admin"), deleteProduct);
+router.delete(
+  "/:id",
+  protect,
+  restrictTo("admin"),
+  deleteProduct
+);
 
 module.exports = router;

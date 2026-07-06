@@ -15,10 +15,12 @@ const productSchema = new mongoose.Schema(
 
     description: {
       type: String,
+      default: "",
     },
 
     category: {
       type: String,
+      default: "",
     },
 
     stock: {
@@ -28,6 +30,7 @@ const productSchema = new mongoose.Schema(
 
     image: {
       type: String,
+      default: "",
     },
   },
   {

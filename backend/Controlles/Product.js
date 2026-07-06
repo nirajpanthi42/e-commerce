@@ -2,7 +2,17 @@ const Product = require("../Models/Product");
 
 const createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    // Create product data from request body
+    const productData = {
+      ...req.body,
+    };
+
+    // Save Cloudinary image URL
+    if (req.file) {
+      productData.image = req.file.path;
+    }
+
+    const product = await Product.create(productData);
 
     res.status(201).json({
       success: true,
@@ -59,10 +69,23 @@ const getProductById = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updateData = {
+      ...req.body,
+    };
+
+    // Update image if a new one is uploaded
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!product) {
       return res.status(404).json({
