@@ -1,8 +1,13 @@
 import api from "./api";
 
-// GET all products
-export const getProducts = async () => {
-  const res = await api.get("/products");
+// GET all products (supports search)
+export const getProducts = async (search = "") => {
+  const res = await api.get("/products", {
+    params: {
+      search,
+    },
+  });
+
   return res.data;
 };
 
