@@ -29,7 +29,30 @@ const createProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const search = req.query.search || "";
+
+    const products = await Product.find({
+      $or: [
+        {
+          name: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          category: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+        {
+          description: {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ],
+    });
 
     res.status(200).json({
       success: true,
