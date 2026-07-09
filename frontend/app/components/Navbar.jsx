@@ -14,7 +14,6 @@ import {
   FiLayout,
   FiMail,
   FiShoppingBag,
-  FiSettings,
   FiShoppingCart
 } from "react-icons/fi";
 import { FaStore } from "react-icons/fa";
@@ -143,11 +142,7 @@ export default function Navbar({
               </span>
             )}
           </div>
-          {cartItemCount > 0 && (
-            <span className="hidden sm:inline text-sm font-medium text-gray-700">
-              ${cartTotal.toFixed(2)}
-            </span>
-          )}
+         
         </Link>
 
         {isAuthenticated ? (

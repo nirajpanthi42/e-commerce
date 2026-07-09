@@ -1,4 +1,4 @@
-// app/layout.tsx
+// frontend/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -24,9 +24,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <CartProvider>
-            <ToastProvider>
-              <main>{children}</main>
-            </ToastProvider>
+              <ToastProvider>
+               
+                <main>{children}</main>
+              </ToastProvider>
           </CartProvider>
         </AuthProvider>
       </body>

@@ -114,6 +114,7 @@ export default function RegisterPage() {
               <input
                 type="text"
                 name="name"
+
                 value={form.name}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm text-black "

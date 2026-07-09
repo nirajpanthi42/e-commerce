@@ -186,10 +186,7 @@ export default function CartPage() {
                item.product?.id || 
                item.product?.productId;
     
-    if (!id) {
-      console.error('⚠️ Item has no ID:', item);
-      return `temp-${Date.now()}-${Math.random()}`;
-    }
+   
     return id;
   };
 
@@ -464,48 +461,14 @@ export default function CartPage() {
                   </div>
                 )}
                 <div className="border-t border-gray-200 pt-3">
-                  <div className="flex justify-between text-lg font-bold">
+                  <div className="flex justify-between text-lg font-bold text-black">
                     <span>Total</span>
-                    <span className="text-blue-600">${grandTotal.toFixed(2)}</span>
+                    <span className="text-blue-600 text-black">${grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Coupon Code */}
-              <div className="mt-6">
-                <label htmlFor="coupon" className="block text-sm font-medium text-gray-700 mb-2">
-                  Coupon Code
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    id="coupon"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    placeholder="Enter coupon code"
-                    disabled={!!appliedCoupon}
-                  />
-                  {appliedCoupon ? (
-                    <button onClick={handleRemoveCoupon} className="px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors duration-200 text-sm font-medium">
-                      Remove
-                    </button>
-                  ) : (
-                    <button onClick={handleApplyCoupon} className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-colors duration-200 text-sm font-medium">
-                      Apply
-                    </button>
-                  )}
-                </div>
-                {appliedCoupon && (
-                  <p className="mt-2 text-sm text-green-600 flex items-center gap-1">
-                    <FiCheckCircle className="text-green-500" />
-                    Coupon {appliedCoupon.code} applied! Saved ${appliedCoupon.discount.toFixed(2)}
-                  </p>
-                )}
-                <p className="mt-2 text-xs text-gray-500">
-                  Try: SAVE10 (10% off), SAVE20 (20% off)
-                </p>
-              </div>
+           
 
               {/* Checkout Button */}
               <button
@@ -532,12 +495,7 @@ export default function CartPage() {
 
               {/* Payment Methods */}
               <div className="mt-6 pt-4 border-t border-gray-200">
-                <p className="text-xs text-center text-gray-500">Secure checkout • SSL Encrypted</p>
-                <div className="flex justify-center gap-3 mt-2">
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">💳 Visa</span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">💳 Mastercard</span>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">💳 PayPal</span>
-                </div>
+              
               </div>
             </div>
           </div>

@@ -23,18 +23,26 @@ export function CartProvider({ children }) {
         const parsedCart = JSON.parse(savedCart);
         console.log('Parsed guest cart:', parsedCart);
         if (Array.isArray(parsedCart) && parsedCart.length > 0) {
-          // Ensure all items have an _id
+          // Ensure all items have required fields
           const fixedCart = parsedCart.map(item => ({
-            ...item,
-            _id: item._id || item.id || item.productId || item.product?._id,
-            id: item._id || item.id || item.productId || item.product?._id,
-            productId: item._id || item.id || item.productId || item.product?._id
+            _id: item._id || item.id || item.productId || `temp-${Date.now()}-${Math.random()}`,
+            id: item._id || item.id || item.productId || `temp-${Date.now()}-${Math.random()}`,
+            productId: item._id || item.id || item.productId || `temp-${Date.now()}-${Math.random()}`,
+            name: item.name || item.product?.name || 'Product',
+            price: Number(item.price || item.product?.price || 0),
+            quantity: Number(item.quantity || 1),
+            image: item.image || item.product?.image || '',
+            category: item.category || item.product?.category || '',
+            stock: item.stock || item.product?.stock || 0
           }));
           console.log('Fixed cart items:', fixedCart);
           setCartItems(fixedCart);
+          // Save fixed cart back to localStorage
+          localStorage.setItem('guestCart', JSON.stringify(fixedCart));
         }
       } catch (error) {
         console.error('Error loading guest cart:', error);
+        setCartItems([]);
       }
     }
   }, []);
@@ -80,11 +88,11 @@ export function CartProvider({ children }) {
       
       const mappedItems = items.map(item => ({
         ...item,
-        _id: item._id || item.id || item.productId || item.product?._id,
-        id: item._id || item.id || item.productId || item.product?._id,
-        productId: item._id || item.id || item.productId || item.product?._id,
-        quantity: item.quantity || 1,
-        price: item.price || item.product?.price || 0,
+        _id: item._id || item.id || item.productId,
+        id: item._id || item.id || item.productId,
+        productId: item._id || item.id || item.productId,
+        quantity: Number(item.quantity || 1),
+        price: Number(item.price || item.product?.price || 0),
         name: item.name || item.product?.name || 'Product',
         image: item.image || item.product?.image || '',
         category: item.category || item.product?.category || ''
@@ -110,28 +118,27 @@ export function CartProvider({ children }) {
       console.log('Adding to cart - product:', product);
       console.log('Adding to cart - quantity:', quantity);
       
-      // Ensure we have the product ID - check nested product object too
-      const productId = product._id || product.id || product.productId || product.product?._id;
+      // Ensure we have the product ID
+      const productId = product._id || product.id || product.productId;
       if (!productId) {
         console.error('Product has no ID:', product);
         throw new Error('Product ID is required');
       }
       
-      // Create a clean product object with _id as the primary key
+      // Create a clean product object with ALL required fields
       const productToAdd = {
         _id: productId,
         id: productId,
         productId: productId,
         name: product.name || product.product?.name || 'Product',
-        price: product.price || product.product?.price || 0,
+        price: Number(product.price || product.product?.price || 0),
+        quantity: Number(quantity),
         image: product.image || product.product?.image || '',
         category: product.category || product.product?.category || '',
-        stock: product.stock || product.product?.stock || 0,
-        quantity: quantity,
-        product: product.product || null // Preserve the product object if it exists
+        stock: Number(product.stock || product.product?.stock || 0)
       };
       
-      console.log('Product to add with _id:', productToAdd);
+      console.log('Product to add:', productToAdd);
       
       if (user) {
         console.log('User is logged in, adding to API cart');
@@ -141,11 +148,10 @@ export function CartProvider({ children }) {
         console.log('Guest user, adding to localStorage cart');
         
         setCartItems(prevItems => {
-          // Check if item already exists using _id
-          const existingItemIndex = prevItems.findIndex(item => {
-            const itemId = item._id || item.id || item.productId || item.product?._id;
-            return itemId === productId;
-          });
+          // Check if item already exists
+          const existingItemIndex = prevItems.findIndex(item => 
+            item._id === productId || item.id === productId || item.productId === productId
+          );
           
           let newItems;
           if (existingItemIndex >= 0) {
@@ -159,7 +165,7 @@ export function CartProvider({ children }) {
           } else {
             // Add new item
             newItems = [...prevItems, productToAdd];
-            console.log('Added new item with _id:', productToAdd);
+            console.log('Added new item:', productToAdd);
           }
           
           // Save to localStorage
@@ -183,60 +189,18 @@ export function CartProvider({ children }) {
       setLoading(true);
       setError(null);
       
-      console.log('=== REMOVE FROM CART ===');
-      console.log('Product ID to remove:', productId);
-      console.log('Current cart items:', cartItems);
-      
-      // Find the item - check ALL possible ID locations including nested product
-      const itemToRemove = cartItems.find(item => {
-        const itemId = item._id || 
-                       item.id || 
-                       item.productId || 
-                       item.product?._id || 
-                       item.product?.id || 
-                       item.product?.productId;
-        return itemId === productId;
-      });
-      
-      console.log('Item to remove:', itemToRemove);
-      
-      if (!itemToRemove) {
-        console.error('❌ Item not found with ID:', productId);
-        console.log('Available items:', cartItems.map(item => ({
-          name: item.name || item.product?.name,
-          _id: item._id,
-          id: item.id,
-          productId: item.productId,
-          product_id: item.product?._id,
-          realId: item._id || item.id || item.productId || item.product?._id
-        })));
-        return;
-      }
+      console.log('Removing from cart:', productId);
       
       if (user) {
-        console.log('User is logged in, removing from API cart');
         await apiRemoveFromCart(productId);
         await fetchCart();
       } else {
-        console.log('Guest user, removing from localStorage cart');
-        
         setCartItems(prevItems => {
-          const newItems = prevItems.filter(item => {
-            const itemId = item._id || 
-                          item.id || 
-                          item.productId || 
-                          item.product?._id || 
-                          item.product?.id || 
-                          item.product?.productId;
-            return itemId !== productId;
-          });
-          
-          console.log('Items before removal:', prevItems.length);
-          console.log('Items after removal:', newItems.length);
-          
+          const newItems = prevItems.filter(item => 
+            item._id !== productId && item.id !== productId && item.productId !== productId
+          );
           localStorage.setItem('guestCart', JSON.stringify(newItems));
-          console.log('Updated guest cart saved to localStorage');
-          
+          console.log('Updated guest cart after remove:', newItems);
           return newItems;
         });
       }
@@ -262,8 +226,7 @@ export function CartProvider({ children }) {
       } else {
         setCartItems(prevItems => {
           const newItems = prevItems.map(item => {
-            const itemId = item._id || item.id || item.productId || item.product?._id;
-            if (itemId === productId) {
+            if (item._id === productId || item.id === productId || item.productId === productId) {
               return { ...item, quantity: Math.max(0, newQuantity) };
             }
             return item;
@@ -309,15 +272,15 @@ export function CartProvider({ children }) {
 
   const getCartTotal = useCallback(() => {
     const total = cartItems.reduce((total, item) => {
-      const price = item.price || item.product?.price || 0;
-      const quantity = item.quantity || 0;
+      const price = Number(item.price || 0);
+      const quantity = Number(item.quantity || 0);
       return total + (price * quantity);
     }, 0);
     return total;
   }, [cartItems]);
 
   const getCartCount = useCallback(() => {
-    const count = cartItems.reduce((count, item) => count + (item.quantity || 0), 0);
+    const count = cartItems.reduce((count, item) => count + Number(item.quantity || 0), 0);
     return count;
   }, [cartItems]);
 
@@ -329,7 +292,6 @@ export function CartProvider({ children }) {
     }
   }, [cartItems, user]);
 
-  // Return the context provider with all values
   return (
     <CartContext.Provider value={{
       cartItems,
@@ -349,7 +311,6 @@ export function CartProvider({ children }) {
   );
 }
 
-// ✅ IMPORTANT: Make sure these exports exist at the bottom
 export function useCart() {
   const context = useContext(CartContext);
   if (!context) {
@@ -358,5 +319,4 @@ export function useCart() {
   return context;
 }
 
-// Also export CartContext if needed
 export { CartContext };
