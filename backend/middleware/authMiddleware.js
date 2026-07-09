@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../Models/ User"); // Make sure the path is correct
+const User = require("../Models/User"); // Make sure the path is correct
 
 // ================= Protect Middleware =================
 const protect = async (req, res, next) => {
@@ -52,7 +52,20 @@ const restrictTo = (...roles) => {
   };
 };
 
+// ================= Admin Middleware =================
+const admin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access required",
+    });
+  }
+};
+
 module.exports = {
   protect,
   restrictTo,
+  admin,
 };
