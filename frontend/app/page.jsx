@@ -1,8 +1,12 @@
+// app/page.jsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import { getProducts } from "./services/product";
+import { useCart } from "./context/CartContext";
+import { useAuth } from "./context/AuthContext";
+import { useToast } from "./components/Toast";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -10,6 +14,10 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [search, setSearch] = useState("");
   const [expandedDescription, setExpandedDescription] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(null);
+  const { addToCart, cartItems, getCartCount } = useCart();
+  const { user } = useAuth();
+  const { success, error: showError, info } = useToast();
 
   useEffect(() => {
     fetchProducts();
@@ -30,6 +38,7 @@ export default function Home() {
       }
     } catch (error) {
       console.log(error);
+      showError("Failed to load products");
       setProducts([]);
     } finally {
       setLoading(false);
@@ -45,21 +54,61 @@ export default function Home() {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  // Toggle description expansion
   const toggleDescription = () => {
     setExpandedDescription(!expandedDescription);
   };
 
-  // Reset expansion when modal closes
   useEffect(() => {
     if (!selectedProduct) {
       setExpandedDescription(false);
     }
   }, [selectedProduct]);
 
+  // Handle Add to Cart - Fixed async/await
+  const handleAddToCart = async (product) => {
+    try {
+      setAddingToCart(product._id);
+      
+      console.log('Adding product to cart:', product);
+      
+      // Add product to cart with complete data
+      await addToCart({
+        _id: product._id,
+        id: product._id,
+        name: product.name || 'Product',
+        price: product.price || 0,
+        image: product.image || '',
+        category: product.category || '',
+        stock: product.stock || 0
+      });
+
+      // Show success toast
+      success(`${product.name} added to cart! 🛒`);
+
+      // Close modal if open
+      if (selectedProduct) {
+        setSelectedProduct(null);
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      showError('Failed to add item to cart');
+    } finally {
+      setTimeout(() => {
+        setAddingToCart(null);
+      }, 500);
+    }
+  };
+
+  // Handle Add to Cart from modal
+  const handleAddToCartFromModal = (product) => {
+    handleAddToCart(product);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 text-black">
       <Navbar search={search} setSearch={setSearch} />
+
+    
 
       <section className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 pb-8 sm:pb-10 lg:pb-12 pt-3 sm:pt-4 md:pt-6 lg:pt-8">
         {loading ? (
@@ -71,8 +120,6 @@ export default function Home() {
           </div>
         ) : (
           <>
-           
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
@@ -86,6 +133,9 @@ export default function Home() {
                         alt={product.name}
                         className="absolute inset-0 w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                         loading="lazy"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/300x300/4F46E5/FFFFFF?text=Product";
+                        }}
                       />
                       {product.stock <= 5 && (
                         <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-semibold">
@@ -116,18 +166,48 @@ export default function Home() {
                         </span>
                       </div>
 
-                      <button
-                        onClick={() => setSelectedProduct(product)}
-                        className="mt-3 sm:mt-4 w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-95 shadow-sm hover:shadow-md"
-                      >
-                        <span className="flex items-center justify-center gap-1.5 sm:gap-2">
-                          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          View
-                        </span>
-                      </button>
+                      <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => setSelectedProduct(product)}
+                          className="col-span-1 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-700 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-95"
+                        >
+                          <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => handleAddToCart(product)}
+                          disabled={product.stock === 0 || addingToCart === product._id}
+                          className={`col-span-1 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 transform hover:scale-[1.02] active:scale-95 shadow-sm hover:shadow-md ${
+                            product.stock === 0
+                              ? "bg-gray-400 cursor-not-allowed text-white"
+                              : addingToCart === product._id
+                              ? "bg-green-500 text-white"
+                              : "bg-blue-600 hover:bg-blue-700 text-white"
+                          }`}
+                        >
+                          {addingToCart === product._id ? (
+                            <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                              <svg className="animate-spin h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Adding...
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                              </svg>
+                              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                            </span>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -152,7 +232,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* Product Details Modal with Read More */}
+      {/* Product Details Modal with Add to Cart */}
       {selectedProduct && (
         <div
           className="fixed inset-0 bg-black/50 sm:bg-black/60 backdrop-blur-sm flex justify-center items-center p-2 sm:p-4 z-50 animate-fadeIn"
@@ -183,6 +263,9 @@ export default function Home() {
                   src={selectedProduct.image || "https://via.placeholder.com/400x400/4F46E5/FFFFFF?text=Product"}
                   alt={selectedProduct.name}
                   className="absolute inset-0 w-full h-full object-contain p-2 sm:p-3 md:p-4"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/400x400/4F46E5/FFFFFF?text=Product";
+                  }}
                 />
                 {/* Desktop close button */}
                 <button
@@ -274,17 +357,33 @@ export default function Home() {
                       Close
                     </button>
                     <button
-                      onClick={() => {
-                        alert(`Added ${selectedProduct.name} to cart!`);
-                        setSelectedProduct(null);
-                      }}
-                      className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow-md order-1 sm:order-2"
+                      onClick={() => handleAddToCartFromModal(selectedProduct)}
+                      disabled={selectedProduct.stock === 0 || addingToCart === selectedProduct._id}
+                      className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-colors duration-200 shadow-sm hover:shadow-md order-1 sm:order-2 ${
+                        selectedProduct.stock === 0
+                          ? "bg-gray-400 cursor-not-allowed text-white"
+                          : addingToCart === selectedProduct._id
+                          ? "bg-green-500 text-white"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                      }`}
                     >
                       <span className="flex items-center justify-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Add to Cart
+                        {addingToCart === selectedProduct._id ? (
+                          <>
+                            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Adding...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            {selectedProduct.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                          </>
+                        )}
                       </span>
                     </button>
                   </div>

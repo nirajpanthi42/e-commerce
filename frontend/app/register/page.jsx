@@ -110,14 +110,13 @@ export default function RegisterPage() {
               Full Name
             </label>
             <div className="relative">
-              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400  text-black" />
               <input
                 type="text"
                 name="name"
-                placeholder="John Doe"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm text-black "
                 required
               />
             </div>
@@ -133,10 +132,9 @@ export default function RegisterPage() {
               <input
                 type="email"
                 name="email"
-                placeholder="example@gmail.com"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm text-black" 
                 required
               />
             </div>
@@ -152,10 +150,9 @@ export default function RegisterPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-sm text-black"
                 required
                 minLength={6}
               />

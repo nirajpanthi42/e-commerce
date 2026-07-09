@@ -71,18 +71,17 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div>
-            <label className="block text-gray-700 font-semibold mb-1.5 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1.5 text-sm text-black">
               Email Address
             </label>
             <div className="relative">
-              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400  text-black" />
               <input
                 type="email"
                 name="email"
-                placeholder="example@gmail.com"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm  text-black"
                 required
               />
             </div>
@@ -90,16 +89,15 @@ export default function LoginPage() {
 
           {/* Password Field */}
           <div>
-            <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-gray-700 font-semibold text-sm">Password</label>
+            <div className="flex justify-between items-center mb-1.5 ">
+              <label className="block text-gray-700 font-semibold text-sm    text-black ">Password</label>
             
             </div>
-            <div className="relative">
+            <div className="relative text-black">
               <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="••••••••"
                 value={form.password}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm"

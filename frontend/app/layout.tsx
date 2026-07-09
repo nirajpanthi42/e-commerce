@@ -1,36 +1,34 @@
+// app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import { ToastProvider } from "./components/Toast";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "E-Commerce Dashboard",
-  description: "Next.js Authentication and CRUD",
+  title: "MyStore",
+  description: "Your awesome store",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full bg-gray-100">
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>
+              <main>{children}</main>
+            </ToastProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

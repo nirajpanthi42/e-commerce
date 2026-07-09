@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-color: #2563eb;
+  border-top-color: transparent;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
