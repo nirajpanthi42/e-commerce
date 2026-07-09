@@ -9,6 +9,8 @@ const cloudinary = require("./Config/cloudinary");
 const productRoutes=require("./Routes/Product")
 
 const authRoutes=require("./Routes/ authRoutes")
+const cartRoutes = require("./Routes/Cart");
+
 
 const app = express();
 
@@ -31,6 +33,7 @@ app.use(express.json());
 
 app.use("/api/products",productRoutes);
 app.use("/api/auth", authRoutes)
+app.use("/api/cart", cartRoutes);
 
 // Home Route
 app.get("/", (req, res) => {
