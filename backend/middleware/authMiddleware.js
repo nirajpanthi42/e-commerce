@@ -1,5 +1,6 @@
+// backend/middleware/authMiddleware.js
 const jwt = require("jsonwebtoken");
-const User = require("../Models/User"); // Make sure the path is correct
+const User = require("../Models/User");
 
 // ================= Protect Middleware =================
 const protect = async (req, res, next) => {
@@ -52,9 +53,10 @@ const restrictTo = (...roles) => {
   };
 };
 
-// ================= Admin Middleware =================
+// ================= Admin Middleware (FIXED) =================
 const admin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
+  // Check if user exists and has role 'admin'
+  if (req.user && req.user.role === 'admin') {
     next();
   } else {
     return res.status(403).json({

@@ -9,7 +9,7 @@ const cloudinary = require("./Config/cloudinary");
 const productRoutes = require("./Routes/Product");
 const authRoutes = require("./Routes/authRoutes");
 const cartRoutes = require("./Routes/Cart");
-const orderRoutes = require("./Routes/Order"); // ✅ Changed from orderRoutes to Order
+const orderRoutes = require("./Routes/Order"); 
 
 const app = express();
 
@@ -26,17 +26,13 @@ app.use(
 
 app.use(express.json());
 
-// Add logging middleware to see all requests
-app.use((req, res, next) => {
-  console.log(`📨 ${req.method} ${req.originalUrl}`);
-  next();
-});
+
 
 // Routes
 app.use("/api/products", productRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/orders", orderRoutes); // ✅ Using orderRoutes
+app.use("/api/auth",authRoutes);
+app.use("/api/cart",cartRoutes);
+app.use("/api/orders",orderRoutes); 
 
 // Home Route
 app.get("/", (req, res) => {
@@ -50,14 +46,14 @@ app.get("/", (req, res) => {
 
 // 404 Handler
 app.use((req, res) => {
-  console.log(`❌ Route not found: ${req.method} ${req.originalUrl}`);
+  console.log(`Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
     success: false,
     message: `Route ${req.originalUrl} Not Found`,
   });
 });
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

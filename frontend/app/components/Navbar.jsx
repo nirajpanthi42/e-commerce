@@ -1,8 +1,8 @@
-// app/components/Navbar.jsx - Update the cart count display
+// app/components/Navbar.jsx
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { 
@@ -14,7 +14,7 @@ import {
   FiLayout,
   FiMail,
   FiShoppingBag,
-  FiShoppingCart
+  FiShoppingCart,
 } from "react-icons/fi";
 import { FaStore } from "react-icons/fa";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -22,6 +22,7 @@ import { MdAdminPanelSettings } from "react-icons/md";
 export default function Navbar({
   search = "",
   setSearch = () => {},
+  products = [], // receive products from parent for suggestions
 }) {
   const {
     user,
@@ -34,15 +35,15 @@ export default function Navbar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Calculate cart values
-  const cartItemCount = getCartCount ? getCartCount() : 0;
-  const cartTotal = getCartTotal ? getCartTotal() : 0;
+  // --- Search Suggestions State (simplified) ---
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const suggestionRefs = useRef([]);
+  const debounceTimer = useRef(null);
+  // ---------------------------------
 
-  // Debug log
-  useEffect(() => {
-    console.log('Navbar - Cart items:', cartItems);
-    console.log('Navbar - Cart count:', cartItemCount);
-  }, [cartItems, cartItemCount]);
+  const cartItemCount = getCartCount ? getCartCount() : 0;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -56,17 +57,34 @@ export default function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close dropdown on escape key
+  // Close suggestions when clicking outside search container
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const searchContainer = document.getElementById("search-container");
+      if (searchContainer && !searchContainer.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close dropdown/suggestions on escape key
   useEffect(() => {
     const handleEscapeKey = (event) => {
-      if (event.key === "Escape" && isDropdownOpen) {
-        setIsDropdownOpen(false);
+      if (event.key === "Escape") {
+        if (isDropdownOpen) setIsDropdownOpen(false);
+        if (showSuggestions) {
+          setShowSuggestions(false);
+          setSelectedIndex(-1);
+        }
       }
     };
 
     document.addEventListener("keydown", handleEscapeKey);
     return () => document.removeEventListener("keydown", handleEscapeKey);
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, showSuggestions]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -77,6 +95,72 @@ export default function Navbar({
     logout();
   };
 
+  // --- Simplified Search Suggestions Logic (only product names) ---
+  const updateSuggestions = useCallback((query) => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    debounceTimer.current = setTimeout(() => {
+      if (!query.trim()) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      const filtered = products
+        .filter(product => 
+          product.name?.toLowerCase().includes(query.toLowerCase())
+        )
+        .slice(0, 8); // limit to 8 suggestions
+
+      setSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+      setSelectedIndex(-1);
+    }, 200);
+  }, [products]);
+
+  useEffect(() => {
+    updateSuggestions(search);
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [search, updateSuggestions]);
+
+  // Keyboard navigation for suggestions
+  const handleKeyDown = (e) => {
+    if (!showSuggestions) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => 
+        prev < suggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+        const selected = suggestions[selectedIndex];
+        if (selected) {
+          setSearch(selected.name);
+          setShowSuggestions(false);
+          window.location.href = `/products/${selected._id}`;
+        }
+      }
+    }
+  };
+
+  const handleSuggestionClick = (product) => {
+    setSearch(product.name);
+    setShowSuggestions(false);
+    window.location.href = `/products/${product._id}`;
+  };
+  // ---------------------------------
+
   return (
     <nav className="bg-white shadow-md px-4 sm:px-6 md:px-8 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 md:gap-6 sticky top-0 z-50">
       {/* Logo */}
@@ -86,43 +170,101 @@ export default function Navbar({
         <span className="xs:hidden">Shop</span>
       </Link>
 
-      {/* Search Bar */}
-      <div className="hidden sm:block flex-1 max-w-xl relative min-w-[150px]">
+      {/* Desktop Search Bar with Simplified Suggestions */}
+      <div id="search-container" className="hidden sm:block flex-1 max-w-xl relative min-w-[150px]">
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (search.trim() && suggestions.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
           className="w-full border border-gray-300 rounded-full py-1.5 sm:py-2 pl-8 sm:pl-10 pr-8 sm:pr-10 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
         <FiSearch className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm sm:text-base" />
         {search && (
           <button
-            onClick={() => setSearch("")}
+            onClick={() => {
+              setSearch("");
+              setShowSuggestions(false);
+            }}
             className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors"
           >
             <FiX className="text-sm sm:text-base" />
           </button>
         )}
+
+        {/* Suggestions Dropdown – Only Product Names */}
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-72 overflow-y-auto z-50 animate-slideDown">
+            {suggestions.map((product, index) => (
+              <div
+                key={product._id}
+                ref={el => suggestionRefs.current[index] = el}
+                className={`px-4 py-2.5 cursor-pointer transition-colors hover:bg-blue-50 ${
+                  index === selectedIndex ? 'bg-blue-50' : ''
+                }`}
+                onClick={() => handleSuggestionClick(product)}
+                onMouseEnter={() => setSelectedIndex(index)}
+              >
+                <p className="text-sm font-medium text-gray-800 truncate">
+                  {product.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Mobile Search */}
-      <div className="sm:hidden w-full order-last mt-1 relative">
+      {/* Mobile Search with Simplified Suggestions */}
+      <div className="sm:hidden w-full order-last mt-1 relative" id="search-container-mobile">
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (search.trim() && suggestions.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
           className="w-full border border-gray-300 rounded-full py-1.5 pl-8 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />
         <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
         {search && (
           <button
-            onClick={() => setSearch("")}
+            onClick={() => {
+              setSearch("");
+              setShowSuggestions(false);
+            }}
             className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors"
           >
             <FiX className="text-sm" />
           </button>
+        )}
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 overflow-y-auto z-50 animate-slideDown">
+            {suggestions.map((product, index) => (
+              <div
+                key={product._id}
+                className={`px-4 py-2.5 cursor-pointer transition-colors hover:bg-blue-50 ${
+                  index === selectedIndex ? 'bg-blue-50' : ''
+                }`}
+                onClick={() => handleSuggestionClick(product)}
+                onMouseEnter={() => setSelectedIndex(index)}
+              >
+                <p className="text-sm font-medium text-gray-800 truncate">
+                  {product.name}
+                </p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -142,7 +284,6 @@ export default function Navbar({
               </span>
             )}
           </div>
-         
         </Link>
 
         {isAuthenticated ? (
@@ -188,15 +329,6 @@ export default function Navbar({
                 </div>
 
                 <div className="py-1">
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <FiUser className="text-base" />
-                    Profile
-                  </Link>
-
                   <Link
                     href="/orders"
                     className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
@@ -246,7 +378,7 @@ export default function Navbar({
               className="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base transition duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
             >
               <FiUser className="text-sm sm:text-base" />
-              <span className="hidden xs:inline">Login</span>
+              <span className=" xs:inline">Login</span>
             </Link>
 
             <Link
@@ -254,7 +386,7 @@ export default function Navbar({
               className="flex items-center gap-1.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base transition duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
             >
               <FiUser className="text-sm sm:text-base" />
-              <span className="hidden xs:inline">Register</span>
+              <span className=" xs:inline">Signup</span>
             </Link>
           </>
         )}

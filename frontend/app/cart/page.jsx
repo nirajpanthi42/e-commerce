@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
+import Navbar from "../components/Navbar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -29,20 +30,21 @@ export default function CartPage() {
     clearCart, 
     getCartTotal,
     getCartCount,
-    loading,
-    error,
+    loading: cartLoading,
+    error: cartError,
     refreshCart
   } = useCart();
+  
   const { user } = useAuth();
   const router = useRouter();
   const { success, error: showError, info, warning } = useToast();
+  
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const [removingItem, setRemovingItem] = useState(null);
   const [updatingItem, setUpdatingItem] = useState(null);
-
 
   useEffect(() => {
     setIsClient(true);
@@ -51,7 +53,6 @@ export default function CartPage() {
     }
   }, []);
 
-  
   const total = getCartTotal();
   const itemCount = getCartCount();
   const subtotal = total;
@@ -74,10 +75,6 @@ export default function CartPage() {
   };
 
   const handleRemoveItem = async (productId) => {
-    console.log('🔄 REMOVE BUTTON CLICKED');
-    console.log('📌 Product ID received:', productId);
-    console.log('📌 Product ID type:', typeof productId);
-    console.log('📦 Current cart items:', cartItems);
     
     // Find the item - check ALL possible ID locations including nested product
     const itemToRemove = cartItems.find(item => {
@@ -87,36 +84,21 @@ export default function CartPage() {
                      item.product?._id || 
                      item.product?.id || 
                      item.product?.productId;
-      console.log(`🔍 Checking item: ${item.name || item.product?.name}, ID: ${itemId}, Match: ${itemId === productId}`);
       return itemId === productId;
     });
     
     if (!itemToRemove) {
-      console.error('❌ Item not found with ID:', productId);
-      console.log('📋 Available IDs:', cartItems.map(item => ({
-        name: item.name || item.product?.name,
-        _id: item._id,
-        id: item.id,
-        productId: item.productId,
-        product_id: item.product?._id,
-        realId: item._id || item.id || item.productId || item.product?._id
-      })));
       showError('Item not found in cart');
       return;
     }
     
-    console.log('✅ Found item to remove:', itemToRemove);
-    
     if (window.confirm(`Remove "${itemToRemove.name || itemToRemove.product?.name}" from your cart?`)) {
       try {
         setRemovingItem(productId);
-        console.log('🗑️ Removing item with ID:', productId);
         await removeFromCart(productId);
-        console.log('✅ Item removed successfully');
         success(`${itemToRemove.name || itemToRemove.product?.name} removed from cart`);
         await refreshCart();
       } catch (err) {
-        console.error('❌ Remove error:', err);
         showError('Failed to remove item');
       } finally {
         setRemovingItem(null);
@@ -137,8 +119,12 @@ export default function CartPage() {
     }
   };
 
-  const handleCheckout = () => {
+  
+
+  
+  const handleProceedToCheckout = () => {
     if (!user) {
+      info("Please login to proceed with checkout");
       router.push("/login?redirect=/cart");
       return;
     }
@@ -147,77 +133,48 @@ export default function CartPage() {
       warning("Your cart is empty!");
       return;
     }
-    
+
+    // Navigate to checkout page
     router.push("/checkout");
   };
 
-  const handleApplyCoupon = () => {
-    const coupon = couponCode.toUpperCase().trim();
-    
-    if (coupon === "SAVE10") {
-      const discountAmount = total * 0.1;
-      setDiscount(discountAmount);
-      setAppliedCoupon({ code: coupon, discount: discountAmount });
-      success(`Coupon ${coupon} applied! You saved $${discountAmount.toFixed(2)}`);
-    } else if (coupon === "SAVE20") {
-      const discountAmount = total * 0.2;
-      setDiscount(discountAmount);
-      setAppliedCoupon({ code: coupon, discount: discountAmount });
-      success(`Coupon ${coupon} applied! You saved $${discountAmount.toFixed(2)}`);
-    } else {
-      showError("Invalid coupon code");
-    }
-  };
-
-  const handleRemoveCoupon = () => {
-    setDiscount(0);
-    setAppliedCoupon(null);
-    setCouponCode("");
-    info("Coupon removed");
-  };
-
-  // Get the product ID from an item - check nested product object
+  // Helper functions to get item properties
   const getItemId = (item) => {
-    // Try all possible locations for the ID
-    const id = item._id || 
-               item.id || 
-               item.productId || 
-               item.product?._id || 
-               item.product?.id || 
-               item.product?.productId;
-    
-   
-    return id;
+    return item._id || 
+           item.id || 
+           item.productId || 
+           item.product?._id || 
+           item.product?.id || 
+           item.product?.productId;
   };
 
-  // Get the product name - check nested product
   const getItemName = (item) => {
     return item.name || item.product?.name || 'Product';
   };
 
-  // Get the product price - check nested product
   const getItemPrice = (item) => {
-    return item.price || item.product?.price || 0;
+    return typeof item.price === 'number' ? item.price : 
+           (item.product?.price || 0);
   };
 
-  // Get the product image - check nested product
   const getItemImage = (item) => {
     return item.image || item.product?.image || '';
   };
 
-  // Get the product category - check nested product
   const getItemCategory = (item) => {
     return item.category || item.product?.category || '';
   };
 
-  // Get the product quantity
   const getItemQuantity = (item) => {
-    return item.quantity || 1;
+    return typeof item.quantity === 'number' ? item.quantity : 1;
   };
+
+  const isLoading = cartLoading;
 
   if (!isClient) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+     
         <div className="flex flex-col items-center gap-4">
           <FiLoader className="text-4xl text-blue-600 animate-spin" />
           <p className="text-gray-600">Loading...</p>
@@ -226,7 +183,7 @@ export default function CartPage() {
     );
   }
 
-  if (loading && cartItems.length === 0) {
+  if (cartLoading && cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -237,7 +194,7 @@ export default function CartPage() {
     );
   }
 
-  if (error) {
+  if (cartError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
@@ -245,7 +202,7 @@ export default function CartPage() {
             <FiAlertCircle className="text-4xl text-red-600" />
           </div>
           <h2 className="mt-4 text-2xl font-bold text-gray-900">Oops! Something went wrong</h2>
-          <p className="mt-2 text-gray-600">{error}</p>
+          <p className="mt-2 text-gray-600">{cartError}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -287,12 +244,13 @@ export default function CartPage() {
   }
 
   return (
+   
+ 
+  
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 sm:py-12">
-      {/* Debug Panel */}
-     
-          
-
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Navbar />
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
@@ -305,12 +263,15 @@ export default function CartPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 mt-3 sm:mt-0">
-            
             <Link href="/" className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-xl hover:bg-gray-50 transition-colors duration-200 shadow-sm">
               <FiArrowLeft />
               Continue Shopping
             </Link>
-            <button onClick={handleClearCart} disabled={loading} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-xl hover:bg-red-50 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+            <button 
+              onClick={handleClearCart} 
+              disabled={isLoading} 
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-xl hover:bg-red-50 transition-colors duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <FiTrash2 />
               Clear Cart
             </button>
@@ -329,14 +290,6 @@ export default function CartPage() {
                   const itemImage = getItemImage(item);
                   const itemCategory = getItemCategory(item);
                   const itemQuantity = getItemQuantity(item);
-                  
-                  console.log(`Rendering item ${index}:`, { 
-                    itemId, 
-                    itemName, 
-                    itemPrice, 
-                    itemQuantity,
-                    rawItem: item 
-                  });
                   
                   return (
                     <div key={itemId || index} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors duration-200">
@@ -382,7 +335,7 @@ export default function CartPage() {
                             <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-1">
                               <button
                                 onClick={() => handleQuantityChange(itemId, itemQuantity - 1)}
-                                disabled={loading || updatingItem === itemId || itemQuantity <= 1}
+                                disabled={isLoading || updatingItem === itemId || itemQuantity <= 1}
                                 className="p-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <FiMinus className="w-4 h-4 text-gray-600" />
@@ -392,21 +345,17 @@ export default function CartPage() {
                               </span>
                               <button
                                 onClick={() => handleQuantityChange(itemId, itemQuantity + 1)}
-                                disabled={loading || updatingItem === itemId}
+                                disabled={isLoading || updatingItem === itemId}
                                 className="p-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <FiPlus className="w-4 h-4 text-gray-600" />
                               </button>
                             </div>
                             <button
-                              onClick={() => {
-                                console.log('🔴 Remove button clicked for item:', itemId);
-                                console.log('🔴 Item data:', item);
-                                handleRemoveItem(itemId);
-                              }}
-                              disabled={loading || removingItem === itemId}
+                              onClick={() => handleRemoveItem(itemId)}
+                              disabled={isLoading || removingItem === itemId}
                               className={`text-red-600 hover:text-red-800 transition-colors duration-200 flex items-center gap-1 text-sm font-medium ${
-                                loading || removingItem === itemId ? 'opacity-50 cursor-not-allowed' : ''
+                                isLoading || removingItem === itemId ? 'opacity-50 cursor-not-allowed' : ''
                               }`}
                             >
                               {removingItem === itemId ? (
@@ -461,50 +410,69 @@ export default function CartPage() {
                   </div>
                 )}
                 <div className="border-t border-gray-200 pt-3">
-                  <div className="flex justify-between text-lg font-bold text-black">
+                  <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-blue-600 text-black">${grandTotal.toFixed(2)}</span>
+                    <span className="text-blue-600">${grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
 
-           
+              {/* Coupon Code Section */}
+              <div className="mt-4 pt-4 border-t border-gray-200">
+               
+              </div>
 
-              {/* Checkout Button */}
+              {/* Checkout Button - Now navigates to checkout page */}
               <button
-                onClick={handleCheckout}
-                disabled={loading || cartItems.length === 0}
+                onClick={handleProceedToCheckout}
+                disabled={isLoading || cartItems.length === 0}
                 className={`mt-6 w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-base font-medium text-white ${
-                  loading || cartItems.length === 0
+                  isLoading || cartItems.length === 0
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02] transition-all duration-200"
                 }`}
               >
-                {loading ? (
-                  <>
-                    <FiLoader className="animate-spin h-5 w-5" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <FiShoppingBag className="text-lg" />
-                    Proceed to Checkout
-                  </>
-                )}
+                <FiShoppingBag className="text-lg" />
+                Proceed to Checkout
               </button>
 
-              {/* Payment Methods */}
-              <div className="mt-6 pt-4 border-t border-gray-200">
-              
-              </div>
+              {/* User Authentication Note */}
+              {!user && (
+                <div className="mt-4 p-3 bg-yellow-50 rounded-lg flex items-start gap-2">
+                  <FiInfo className="text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-yellow-800">
+                    Please <Link href="/login?redirect=/cart" className="font-semibold underline hover:text-yellow-900">login</Link> to complete your order
+                  </p>
+                </div>
+              )}
+
+              {user && cartItems.length > 0 && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-start gap-2">
+                  <FiCheckCircle className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-blue-800">
+                    You're ready to checkout! Click the button above to proceed.
+                  </p>
+                </div>
+              )}
+
+              {/* Debug info - Remove in production */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-4 p-3 bg-gray-100 rounded-lg text-xs">
+                  <details>
+                    <summary className="cursor-pointer font-medium">Debug Info</summary>
+                    <div className="mt-2 space-y-1">
+                      <p>Cart Items: {cartItems.length}</p>
+                      <p>User: {user?._id || user?.id || 'Not logged in'}</p>
+                      <p>Total: ${grandTotal.toFixed(2)}</p>
+                      <p>Is Loading: {isLoading ? 'Yes' : 'No'}</p>
+                    </div>
+                  </details>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Keyboard shortcut hint */}
-      
-     
     </div>
   );
 }

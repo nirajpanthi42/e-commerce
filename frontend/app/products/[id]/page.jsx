@@ -1,7 +1,7 @@
 // app/products/[id]/page.jsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "../../context/CartContext";
@@ -25,7 +25,9 @@ import {
   FiAlertCircle,
   FiMinus,
   FiPlus,
-  FiShoppingBag
+  FiShoppingBag,
+  FiChevronDown,
+  FiChevronUp
 } from "react-icons/fi";
 
 export default function ProductDetailsPage() {
@@ -36,15 +38,14 @@ export default function ProductDetailsPage() {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const { addToCart } = useCart();
   const { user } = useAuth();
   const { success, error: showError } = useToast();
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  // Memoized fetch function
+  const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -64,6 +65,11 @@ export default function ProductDetailsPage() {
       
       if (foundProduct) {
         setProduct(foundProduct);
+        // Find related products (same category, excluding current product)
+        const related = products
+          .filter(p => p.category === foundProduct.category && p._id !== foundProduct._id)
+          .slice(0, 4);
+        setRelatedProducts(related);
       } else {
         setError('Product not found');
       }
@@ -73,18 +79,23 @@ export default function ProductDetailsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const handleQuantityChange = (newQuantity) => {
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
+
+  // Memoized handlers
+  const handleQuantityChange = useCallback((newQuantity) => {
     if (newQuantity < 1) return;
     if (product && newQuantity > product.stock) {
       showError(`Only ${product.stock} items available in stock`);
       return;
     }
     setQuantity(newQuantity);
-  };
+  }, [product, showError]);
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = useCallback(async () => {
     if (!product) return;
     
     try {
@@ -108,9 +119,9 @@ export default function ProductDetailsPage() {
     } finally {
       setAddingToCart(false);
     }
-  };
+  }, [product, quantity, addToCart, success, showError]);
 
-  const handleBuyNow = () => {
+  const handleBuyNow = useCallback(() => {
     if (!user) {
       router.push('/login?redirect=/products/' + id);
       return;
@@ -119,15 +130,75 @@ export default function ProductDetailsPage() {
     setTimeout(() => {
       router.push('/checkout');
     }, 500);
-  };
+  }, [user, router, id, handleAddToCart]);
 
-  const formatPrice = (price) => {
+  // Memoized price formatter
+  const formatPrice = useCallback((price) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(price);
-  };
+  }, []);
 
+  // Memoized rating stars
+  const renderStars = useCallback((rating) => {
+    return (
+      <div className="flex items-center gap-0.5">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <FiStar
+            key={star}
+            className={`w-4 h-4 ${
+              star <= (rating || 4)
+                ? 'text-yellow-400 fill-current'
+                : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  }, []);
+
+  // Memoized shipping info
+  const shippingInfo = useMemo(() => [
+    {
+      icon: FiTruck,
+      title: "Free Shipping",
+      subtitle: "On orders over $100"
+    },
+    {
+      icon: FiShield,
+      title: "Secure Payment",
+      subtitle: "100% secure checkout"
+    },
+    {
+      icon: FiRotateCcw,
+      title: "Easy Returns",
+      subtitle: "30-day return policy"
+    },
+    {
+      icon: FiPackage,
+      title: "Quality Guarantee",
+      subtitle: "Premium products"
+    }
+  ], []);
+
+  // Memoized product images
+  const productImage = useMemo(() => {
+    return product?.image || "https://via.placeholder.com/600x600/4F46E5/FFFFFF?text=Product";
+  }, [product]);
+
+  // Memoized description
+  const description = useMemo(() => {
+    return product?.description || "";
+  }, [product]);
+
+  const descriptionLength = 150;
+  const shouldShowReadMore = description.length > descriptionLength;
+  const truncatedDescription = shouldShowReadMore 
+    ? description.slice(0, descriptionLength) + "..."
+    : description;
+
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
@@ -139,6 +210,7 @@ export default function ProductDetailsPage() {
     );
   }
 
+  // Error state
   if (error || !product) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4">
@@ -187,15 +259,16 @@ export default function ProductDetailsPage() {
             <div className="space-y-4">
               <div className="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden">
                 <img
-                  src={product.image || "https://via.placeholder.com/600x600/4F46E5/FFFFFF?text=Product"}
+                  src={productImage}
                   alt={product.name}
                   className="w-full h-full object-contain p-4"
                   onError={(e) => {
                     e.target.src = "https://via.placeholder.com/600x600/4F46E5/FFFFFF?text=Product";
                   }}
+                  loading="lazy"
                 />
                 {product.stock <= 5 && product.stock > 0 && (
-                  <span className="absolute top-4 right-4 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="absolute top-4 right-4 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full animate-pulse">
                     Low Stock
                   </span>
                 )}
@@ -224,18 +297,7 @@ export default function ProductDetailsPage() {
 
               {/* Rating */}
               <div className="flex items-center gap-3 mt-2">
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FiStar
-                      key={star}
-                      className={`w-4 h-4 ${
-                        star <= (product.rating || 4)
-                          ? 'text-yellow-400 fill-current'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
+                {renderStars(product.rating)}
                 <span className="text-sm text-gray-500">
                   ({product.reviews || 24} reviews)
                 </span>
@@ -259,7 +321,7 @@ export default function ProductDetailsPage() {
                   product.stock > 0 ? 'text-green-600' : 'text-red-600'
                 }`}>
                   <div className={`w-2 h-2 rounded-full ${
-                    product.stock > 0 ? 'bg-green-500' : 'bg-red-500'
+                    product.stock > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'
                   }`} />
                   <span className="font-medium">
                     {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
@@ -272,12 +334,32 @@ export default function ProductDetailsPage() {
                 )}
               </div>
 
-              {/* Description */}
+              {/* Description with Read More */}
               <div className="mt-6">
                 <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
-                <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                  {product.description}
-                </p>
+                <div className="text-gray-600 leading-relaxed">
+                  <p className="whitespace-pre-wrap">
+                    {isDescriptionExpanded ? description : truncatedDescription}
+                  </p>
+                  {shouldShowReadMore && (
+                    <button
+                      onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                      className="mt-2 text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
+                    >
+                      {isDescriptionExpanded ? (
+                        <>
+                          Show Less
+                          <FiChevronUp className="text-sm" />
+                        </>
+                      ) : (
+                        <>
+                          Read More
+                          <FiChevronDown className="text-sm" />
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Quantity Selector */}
@@ -291,6 +373,7 @@ export default function ProductDetailsPage() {
                       onClick={() => handleQuantityChange(quantity - 1)}
                       disabled={quantity <= 1}
                       className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="Decrease quantity"
                     >
                       <FiMinus className="w-4 h-4" />
                     </button>
@@ -301,6 +384,7 @@ export default function ProductDetailsPage() {
                       onClick={() => handleQuantityChange(quantity + 1)}
                       disabled={quantity >= product.stock}
                       className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="Increase quantity"
                     >
                       <FiPlus className="w-4 h-4" />
                     </button>
@@ -333,9 +417,7 @@ export default function ProductDetailsPage() {
                           </>
                         )}
                       </button>
-                     
                     </div>
-                  
                   </>
                 ) : (
                   <button
@@ -349,38 +431,88 @@ export default function ProductDetailsPage() {
 
               {/* Shipping Info */}
               <div className="mt-8 grid grid-cols-2 gap-3 border-t border-gray-100 pt-6">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <FiTruck className="text-blue-600 text-lg" />
-                  <div>
-                    <p className="font-medium">Free Shipping</p>
-                    <p className="text-xs text-gray-400">On orders over $100</p>
+                {shippingInfo.map((info, index) => (
+                  <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                    <info.icon className="text-blue-600 text-lg flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">{info.title}</p>
+                      <p className="text-xs text-gray-400">{info.subtitle}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <FiShield className="text-blue-600 text-lg" />
-                  <div>
-                    <p className="font-medium">Secure Payment</p>
-                    <p className="text-xs text-gray-400">100% secure checkout</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <FiRotateCcw className="text-blue-600 text-lg" />
-                  <div>
-                    <p className="font-medium">Easy Returns</p>
-                    <p className="text-xs text-gray-400">30-day return policy</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <FiPackage className="text-blue-600 text-lg" />
-                  <div>
-                    <p className="font-medium">Quality Guarantee</p>
-                    <p className="text-xs text-gray-400">Premium products</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Related Products</h2>
+              <Link 
+                href="/" 
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
+              >
+                View All
+                <FiArrowLeft className="rotate-180" />
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {relatedProducts.map((relatedProduct) => (
+                <Link
+                  key={relatedProduct._id}
+                  href={`/products/${relatedProduct._id}`}
+                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 block"
+                >
+                  <div className="aspect-square bg-gray-100 overflow-hidden">
+                    <img
+                      src={relatedProduct.image || "https://via.placeholder.com/400x400/4F46E5/FFFFFF?text=Product"}
+                      alt={relatedProduct.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/400x400/4F46E5/FFFFFF?text=Product";
+                      }}
+                      loading="lazy"
+                    />
+                    {relatedProduct.stock <= 5 && relatedProduct.stock > 0 && (
+                      <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                        Low Stock
+                      </span>
+                    )}
+                    {relatedProduct.stock === 0 && (
+                      <span className="absolute top-2 right-2 bg-gray-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                        Out of Stock
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base line-clamp-1">
+                      {relatedProduct.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-lg font-bold text-blue-600">
+                        {formatPrice(relatedProduct.price)}
+                      </p>
+                      {relatedProduct.oldPrice && (
+                        <p className="text-xs text-gray-400 line-through">
+                          {formatPrice(relatedProduct.oldPrice)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-1">
+                      {renderStars(relatedProduct.rating)}
+                      <span className="text-xs text-gray-500">
+                        ({relatedProduct.reviews || 0})
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

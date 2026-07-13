@@ -5,12 +5,12 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { ToastProvider } from "./components/Toast";
-
+import { OrderProvider } from "./context/OrderContext"; // Changed this line
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MyStore",
+  title: "E-commerce",
   description: "Your awesome store",
 };
 
@@ -24,10 +24,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <CartProvider>
-              <ToastProvider>
-               
+            <ToastProvider>
+              <OrderProvider> {/* Changed from OrderContext to OrderProvider */}
                 <main>{children}</main>
-              </ToastProvider>
+              </OrderProvider>
+            </ToastProvider>
           </CartProvider>
         </AuthProvider>
       </body>
