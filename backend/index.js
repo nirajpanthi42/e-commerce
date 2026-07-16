@@ -10,6 +10,8 @@ const productRoutes = require("./Routes/Product");
 const authRoutes = require("./Routes/authRoutes");
 const cartRoutes = require("./Routes/Cart");
 const orderRoutes = require("./Routes/Order"); 
+const reviewRoutes = require('./Routes/reviewRoutes');
+const userRoutes = require('./Routes/userRoutes');
 
 const app = express();
 
@@ -29,10 +31,12 @@ app.use(express.json());
 
 
 // Routes
-app.use("/api/products", productRoutes);
+app.use("/api/products",productRoutes);
 app.use("/api/auth",authRoutes);
 app.use("/api/cart",cartRoutes);
 app.use("/api/orders",orderRoutes); 
+app.use('/api/reviews',reviewRoutes);
+app.use('/api/users',userRoutes);
 
 // Home Route
 app.get("/", (req, res) => {
