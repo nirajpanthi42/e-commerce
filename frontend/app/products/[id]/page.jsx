@@ -1,4 +1,3 @@
-// app/products/[id]/page.jsx
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -8,6 +7,8 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../components/Toast";
 import { getProducts } from "../../services/product";
+import ReviewList from "../../reviews/ReviewList";
+import ReviewForm from "../../reviews/ReviewForm";
 import {
   FiArrowLeft,
   FiShoppingCart,
@@ -43,6 +44,10 @@ export default function ProductDetailsPage() {
   const { addToCart } = useCart();
   const { user } = useAuth();
   const { success, error: showError } = useToast();
+
+  // State for reviews
+  const [refreshReviews, setRefreshReviews] = useState(0);
+  const [editingReview, setEditingReview] = useState(null);
 
   // Memoized fetch function
   const fetchProduct = useCallback(async () => {
@@ -131,6 +136,13 @@ export default function ProductDetailsPage() {
       router.push('/checkout');
     }, 500);
   }, [user, router, id, handleAddToCart]);
+
+  // Review success handler
+  const handleReviewSuccess = useCallback(() => {
+    setRefreshReviews(prev => prev + 1);
+    setEditingReview(null);
+    success('Review submitted successfully!');
+  }, [success]);
 
   // Memoized price formatter
   const formatPrice = useCallback((price) => {
@@ -445,6 +457,39 @@ export default function ProductDetailsPage() {
           </div>
         </div>
 
+        {/* Reviews Section */}
+        <div className="mt-12 bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Customer Reviews</h2>
+
+          {/* Review Form - shown only if user is logged in */}
+          {user ? (
+            <ReviewForm
+              productId={product._id}
+              existingReview={editingReview}
+              onSuccess={handleReviewSuccess}
+              onCancel={() => setEditingReview(null)}
+            />
+          ) : (
+            <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-600">
+              <p>
+                <Link href="/login" className="text-blue-600 hover:underline font-medium">
+                  Log in
+                </Link>
+                {" "}to write a review.
+              </p>
+            </div>
+          )}
+
+          {/* Review List */}
+          <div className="mt-6">
+            <ReviewList
+              productId={product._id}
+              refreshTrigger={refreshReviews}
+              onEditReview={setEditingReview}
+            />
+          </div>
+        </div>
+
         {/* Related Products Section */}
         {relatedProducts.length > 0 && (
           <div className="mt-12">
@@ -466,7 +511,7 @@ export default function ProductDetailsPage() {
                   href={`/products/${relatedProduct._id}`}
                   className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1 block"
                 >
-                  <div className="aspect-square bg-gray-100 overflow-hidden">
+                  <div className="aspect-square bg-gray-100 overflow-hidden relative">
                     <img
                       src={relatedProduct.image || "https://via.placeholder.com/400x400/4F46E5/FFFFFF?text=Product"}
                       alt={relatedProduct.name}

@@ -288,7 +288,7 @@ export default function AdminOrdersPage() {
                   onClick={() => setFilterStatus(status)}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                     filterStatus === status
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-black shadow-md'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -383,7 +383,7 @@ export default function AdminOrdersPage() {
                               {orderItems.length}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-4 whitespace-nowrap font-semibold text-black">
                             {getStatusBadge(orderStatus)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
