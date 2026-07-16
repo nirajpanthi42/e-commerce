@@ -21,7 +21,7 @@ connectDB();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000",
+      origin:['https://e-commerce-frontend.onrender.com', 'http://localhost:3000'],
     credentials: true,
   })
 );
