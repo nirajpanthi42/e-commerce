@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:"https://e-commerce-3-23ca.onrender.com/api"
+  baseURL:"https://e-commerce-3-23ca.onrender.com/api", // Update this to your backend API URL
 });
 
 // Attach JWT token automatically
