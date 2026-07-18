@@ -19,8 +19,8 @@ const ReviewItem = ({ review, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="border-b py-4">
-      <div className="flex justify-between items-start">
+    <div className="border-b py-4 text-black">
+      <div className="flex justify-between items-start ">
         <div>
           <div className="font-semibold">{review.user.name}</div>
           <div className="flex items-center gap-1 text-yellow-500">

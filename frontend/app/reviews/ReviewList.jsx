@@ -29,11 +29,11 @@ const ReviewList = ({ productId, refreshTrigger }) => {
 
   return (
     <div className="mt-6">
-      <h3 className="text-xl font-semibold mb-4">
+      <h3 className="text-xl font-semibold mb-4 text-black">
         Reviews ({reviews.length})
       </h3>
       {reviews.length === 0 ? (
-        <p className="text-gray-500">No reviews yet. Be the first!</p>
+        <p className="text-gray-500 text-black">No reviews yet. Be the first!</p>
       ) : (
         reviews.map((review) => (
           <ReviewItem

@@ -59,7 +59,7 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border p-4 rounded-lg mt-4">
+    <form onSubmit={handleSubmit} className="border p-4 rounded-lg mt-4 text-black ">
       <h4 className="font-medium mb-2">
         {isEdit ? 'Edit Your Review' : 'Write a Review'}
       </h4>

@@ -27,10 +27,10 @@ export default function ProductTable({
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 overflow-x-auto">
-      <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+      <h2 className="text-2xl sm:text-3xl font-bold text-black mb-4 sm:mb-6 flex items-center gap-2">
         <FaShoppingBag className="text-blue-600 text-2xl sm:text-3xl" />
         <span>Product List</span>
-        <span className="ml-auto text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+        <span className="ml-auto text-sm font-medium text-black bg-gray-100 px-3 py-1 rounded-full">
           {productList.length} {productList.length === 1 ? 'Product' : 'Products'}
         </span>
       </h2>
@@ -61,7 +61,7 @@ export default function ProductTable({
                   }`}
                 >
                   {/* Index */}
-                  <td className="border p-3 font-semibold text-gray-600">
+                  <td className="border p-3 font-semibold text-black">
                     <span className="flex items-center gap-1.5">
                       <FiHash className="text-gray-400" />
                       {index + 1}
@@ -89,7 +89,7 @@ export default function ProductTable({
                   </td>
 
                   {/* Name */}
-                  <td className="border p-3 font-semibold text-gray-700">
+                  <td className="border p-3 font-semibold text-black">
                     <div className="flex items-center gap-2">
                       <FiPackage className="text-blue-500 flex-shrink-0" />
                       <span className="truncate max-w-[150px]">{product.name}</span>
@@ -97,16 +97,16 @@ export default function ProductTable({
                   </td>
 
                   {/* Price */}
-                  <td className="border p-3 font-bold text-blue-600">
+                  <td className="border p-3 font-bold text-black">
                     <div className="flex items-center gap-1">
-                      <FiDollarSign className="text-blue-600" />
-                      {Number(product.price).toFixed(2)}
+                      <FiDollarSign className="text-black" />
+                      ${Number(product.price).toFixed(2)}
                     </div>
                   </td>
 
                   {/* Category */}
                   <td className="border p-3">
-                    <span className="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
+                    <span className="inline-flex items-center gap-1.5 bg-purple-100 text-black px-3 py-1 rounded-full text-sm font-medium">
                       <FiTag className="text-purple-500 text-xs" />
                       {product.category || "N/A"}
                     </span>
@@ -114,12 +114,12 @@ export default function ProductTable({
 
                   {/* Stock */}
                   <td className="border p-3">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold ${
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold text-black ${
                       product.stock > 20 
-                        ? "bg-green-100 text-green-700" 
+                        ? "bg-green-100" 
                         : product.stock > 5 
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
+                        ? "bg-yellow-100"
+                        : "bg-red-100"
                     }`}>
                       <FiBox className="text-xs" />
                       {product.stock ?? 0}
@@ -127,7 +127,7 @@ export default function ProductTable({
                   </td>
 
                   {/* Description */}
-                  <td className="border p-3 text-gray-600 max-w-xs">
+                  <td className="border p-3 text-black max-w-xs">
                     <div className="flex items-start gap-1.5">
                       <FiFileText className="text-gray-400 flex-shrink-0 mt-0.5" />
                       <span className="truncate">
@@ -166,12 +166,12 @@ export default function ProductTable({
               <tr>
                 <td
                   colSpan={isAdmin ? 8 : 7}
-                  className="text-center py-12 text-gray-500"
+                  className="text-center py-12 text-black"
                 >
                   <div className="flex flex-col items-center gap-3">
                     <FiAlertCircle className="text-4xl text-gray-400" />
                     <p className="text-lg font-medium">No Products Found</p>
-                    <p className="text-sm text-gray-400">Add your first product to get started</p>
+                    <p className="text-sm">Add your first product to get started</p>
                   </div>
                 </td>
               </tr>
@@ -210,36 +210,36 @@ export default function ProductTable({
                 {/* Product Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-gray-800 truncate flex-1">
+                    <h3 className="font-semibold text-black truncate flex-1">
                       {product.name}
                     </h3>
-                    <span className="text-xs text-gray-400 ml-2">
+                    <span className="text-xs text-black ml-2">
                       #{index + 1}
                     </span>
                   </div>
                   
-                  <p className="text-blue-600 font-bold text-lg mt-1">
+                  <p className="text-black font-bold text-lg mt-1">
                     ${Number(product.price).toFixed(2)}
                   </p>
                   
                   <div className="flex flex-wrap gap-1.5 mt-2">
-                    <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full text-xs">
-                      <FiTag className="text-xs" />
+                    <span className="inline-flex items-center gap-1 bg-purple-100 text-black px-2 py-0.5 rounded-full text-xs">
+                      <FiTag className="text-purple-500 text-xs" />
                       {product.category || "N/A"}
                     </span>
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold text-black ${
                       product.stock > 20 
-                        ? "bg-green-100 text-green-700" 
+                        ? "bg-green-100" 
                         : product.stock > 5 
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
+                        ? "bg-yellow-100"
+                        : "bg-red-100"
                     }`}>
                       <FiBox className="text-xs" />
                       Stock: {product.stock ?? 0}
                     </span>
                   </div>
                   
-                  <p className="text-gray-500 text-sm mt-2 truncate">
+                  <p className="text-black text-sm mt-2 truncate">
                     {product.description || "No description"}
                   </p>
 
@@ -267,11 +267,11 @@ export default function ProductTable({
             </div>
           ))
         ) : (
-          <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl">
+          <div className="text-center py-12 text-black bg-gray-50 rounded-xl">
             <div className="flex flex-col items-center gap-3">
               <FiAlertCircle className="text-4xl text-gray-400" />
               <p className="text-lg font-medium">No Products Found</p>
-              <p className="text-sm text-gray-400">Add your first product to get started</p>
+              <p className="text-sm">Add your first product to get started</p>
             </div>
           </div>
         )}

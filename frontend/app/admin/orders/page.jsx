@@ -88,7 +88,7 @@ export default function AdminOrdersPage() {
     const Icon = statusConfig.icon;
     
     return (
-      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold  text-black ${statusConfig.bg} ${statusConfig.text}`}>
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-black ${statusConfig.bg} ${statusConfig.text}`}>
         <Icon className="w-3 h-3" />
         {statusConfig.label}
       </span>
@@ -288,7 +288,7 @@ export default function AdminOrdersPage() {
                   onClick={() => setFilterStatus(status)}
                   className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                     filterStatus === status
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-black shadow-md'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -305,7 +305,7 @@ export default function AdminOrdersPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-2xl shadow-lg p-12 text-center"
+              className="bg-white rounded-2xl shadow-lg p-12 text-center" 
             >
               <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FiPackage className="w-12 h-12 text-gray-400" />
@@ -348,7 +348,7 @@ export default function AdminOrdersPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-gray-200 text-black">
                     {filteredOrders.map((order, index) => {
                       const orderId = order._id || order.id;
                       const orderStatus = order.status || 'pending';
@@ -383,7 +383,7 @@ export default function AdminOrdersPage() {
                               {orderItems.length}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap font-semibold text-black">
+                          <td className="px-6 py-4 whitespace-nowrap font-semibold">
                             {getStatusBadge(orderStatus)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -394,16 +394,20 @@ export default function AdminOrdersPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
+                              {/* 
+                                ★★★ DROPDOWN WITH BLACK TEXT ★★★
+                                Added text-black to select and option
+                              */}
                               <select
                                 value={orderStatus}
                                 onChange={(e) => handleStatusUpdate(orderId, e.target.value)}
                                 disabled={updating === orderId}
-                                className={`border rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
+                                className={`border rounded-xl px-3 py-1.5 text-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
                                   updating === orderId ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                               >
                                 {statusOptions.filter(s => s !== 'all').map((status) => (
-                                  <option key={status} value={status}>
+                                  <option key={status} value={status} className="text-black">
                                     {status.charAt(0).toUpperCase() + status.slice(1)}
                                   </option>
                                 ))}

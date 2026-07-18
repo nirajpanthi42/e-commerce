@@ -67,7 +67,7 @@ export default function CartPage() {
       await updateQuantity(productId, newQuantity);
       await refreshCart();
     } catch (err) {
-      console.error('Quantity update error:', err);
+
       showError("Failed to update quantity");
     } finally {
       setUpdatingItem(null);
@@ -113,7 +113,6 @@ export default function CartPage() {
         success("Cart cleared successfully");
         await refreshCart();
       } catch (err) {
-        console.error('Clear cart error:', err);
         showError("Failed to clear cart");
       }
     }
@@ -246,11 +245,13 @@ export default function CartPage() {
   return (
    
  
-  
+  <div>
+<Navbar/>
+
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 sm:py-12">
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Navbar />
+      
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
@@ -455,24 +456,12 @@ export default function CartPage() {
                 </div>
               )}
 
-              {/* Debug info - Remove in production */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mt-4 p-3 bg-gray-100 rounded-lg text-xs">
-                  <details>
-                    <summary className="cursor-pointer font-medium">Debug Info</summary>
-                    <div className="mt-2 space-y-1">
-                      <p>Cart Items: {cartItems.length}</p>
-                      <p>User: {user?._id || user?.id || 'Not logged in'}</p>
-                      <p>Total: ${grandTotal.toFixed(2)}</p>
-                      <p>Is Loading: {isLoading ? 'Yes' : 'No'}</p>
-                    </div>
-                  </details>
-                </div>
-              )}
+            
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

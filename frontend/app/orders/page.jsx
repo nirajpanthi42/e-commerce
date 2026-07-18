@@ -46,8 +46,11 @@ export default function OrdersPage() {
   const ordersList = Array.isArray(orders) ? orders : [];
 
   return (
+    <div>
+
+    <Navbar></Navbar>
     <div className="min-h-screen bg-gray-50 py-8">
-      <Navbar />
+    
       <div className="container mx-auto px-4">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
@@ -125,6 +128,7 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

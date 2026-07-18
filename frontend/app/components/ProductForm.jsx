@@ -189,7 +189,7 @@ export default function ProductForm({
         <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button
             type="submit"
-            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-95 shadow-md hover:shadow-lg"
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold text-white transition-all duration-200 transform hover:scale-[1.02] active:scale-95 shadow-md hover:shadow-lg bg-black"
             style={{
               background: editing 
                 ? 'linear-gradient(135deg, #f59e0b, #d97706)'
