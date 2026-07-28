@@ -28,6 +28,7 @@ import {
   FiCalendar,
   FiDollarSign
 } from "react-icons/fi";
+import PaymentButton from "../components/PaymentButton";
 
 export default function CheckoutPage() {
   const { 
@@ -132,6 +133,12 @@ export default function CheckoutPage() {
       }));
     }
   }, [user, cartItems, cartLoading]);
+
+  // Validate basic info for eSewa
+  const validateEsewaBasicInfo = () => {
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode'];
+    return requiredFields.every(field => formData[field]?.trim() !== '');
+  };
 
   // Validate form
   const validateForm = () => {
@@ -276,14 +283,23 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (!validateForm()) {
-      const firstError = Object.keys(errors)[0];
-      const element = document.querySelector(`[name="${firstError}"]`);
-      if (element) {
-        element.focus();
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Skip full validation for eSewa as it will be handled by PaymentButton
+    if (paymentMethod !== "esewa") {
+      if (!validateForm()) {
+        const firstError = Object.keys(errors)[0];
+        const element = document.querySelector(`[name="${firstError}"]`);
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
       }
-      return;
+    } else {
+      // For eSewa, still validate basic info
+      if (!validateEsewaBasicInfo()) {
+        warning("Please fill in all required shipping information");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -306,7 +322,7 @@ export default function CheckoutPage() {
         discount: 0,
         couponCode: null,
         paymentMethod: paymentMethod,
-        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending',
+        paymentStatus: 'pending',
         shippingAddress: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -347,20 +363,28 @@ export default function CheckoutPage() {
 
       const newOrder = await createOrder(orderPayload);
       setOrderData(newOrder);
-      await clearCart();
-      await refreshCart();
       setOrderId(newOrder._id || newOrder.id);
-      setOrderComplete(true);
       
-      if (paymentMethod === 'cod') {
-        success("Order placed successfully! Pay cash on delivery. 🎉");
+      // For non-eSewa payments, proceed as normal
+      if (paymentMethod !== "esewa") {
+        await clearCart();
+        await refreshCart();
+        setOrderComplete(true);
+        
+        if (paymentMethod === 'cod') {
+          success("Order placed successfully! Pay cash on delivery. 🎉");
+        } else {
+          success("Order placed successfully! 🎉");
+        }
+        
+        setTimeout(() => {
+          router.push(`/orders/${newOrder._id || newOrder.id}`);
+        }, 5000);
       } else {
-        success("Order placed successfully! 🎉");
+        // For eSewa, don't clear cart yet - wait for payment confirmation
+        success("Order created! Redirecting to eSewa payment... 🎉");
+        // The PaymentButton component will handle the redirect
       }
-      
-      setTimeout(() => {
-        router.push(`/orders/${newOrder._id || newOrder.id}`);
-      }, 5000);
 
     } catch (error) {
       console.error('Checkout error:', error);
@@ -412,6 +436,7 @@ export default function CheckoutPage() {
               <p><span className="font-medium">Estimated Delivery:</span> {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
               <p><span className="font-medium">Payment Method:</span> {
                 orderData.paymentMethod === 'card' ? 'Credit Card' : 
+                orderData.paymentMethod === 'esewa' ? 'eSewa' :
                 orderData.paymentMethod === 'cod' ? 'Cash on Delivery' : 
                 'PayPal'
               }</p>
@@ -448,6 +473,7 @@ export default function CheckoutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+         
           <div className="flex items-center gap-3">
             <Link 
               href="/cart" 
@@ -720,6 +746,7 @@ export default function CheckoutPage() {
                         <option value="Germany">Germany</option>
                         <option value="France">France</option>
                         <option value="Japan">Japan</option>
+                        <option value="Nepal">Nepal</option>
                         <option value="Other">Other</option>
                       </select>
                     </div>
@@ -892,6 +919,7 @@ export default function CheckoutPage() {
                           <option value="Germany">Germany</option>
                           <option value="France">France</option>
                           <option value="Japan">Japan</option>
+                          <option value="Nepal">Nepal</option>
                           <option value="Other">Other</option>
                         </select>
                       </div>
@@ -908,7 +936,7 @@ export default function CheckoutPage() {
                 </h2>
                 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
                       paymentMethod === "card" 
                         ? 'border-blue-500 bg-blue-50' 
@@ -923,7 +951,7 @@ export default function CheckoutPage() {
                         className="text-blue-600 focus:ring-blue-500"
                       />
                       <FiCreditCard className={paymentMethod === "card" ? 'text-blue-600' : 'text-gray-600'} />
-                      <span className="text-sm font-medium">Credit Card</span>
+                      <span className="text-sm font-medium">Card</span>
                     </label>
                     
                     <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
@@ -956,7 +984,24 @@ export default function CheckoutPage() {
                         className="text-blue-600 focus:ring-blue-500"
                       />
                       <FiDollarSign className={paymentMethod === "cod" ? 'text-blue-600' : 'text-gray-600'} />
-                      <span className="text-sm font-medium">Cash on Delivery</span>
+                      <span className="text-sm font-medium">COD</span>
+                    </label>
+
+                    {/* eSewa Payment Option */}
+                    <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                      paymentMethod === "esewa" 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="esewa"
+                        checked={paymentMethod === "esewa"}
+                        onChange={() => setPaymentMethod("esewa")}
+                        className="text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-sm font-medium text-green-600">eSewa</span>
                     </label>
                   </div>
 
@@ -1087,6 +1132,27 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* eSewa Payment Info */}
+                  {paymentMethod === "esewa" && (
+                    <div className="p-4 bg-green-50 rounded-lg flex items-start gap-3 border border-green-200">
+                      <FiShield className="text-green-600 flex-shrink-0 mt-0.5 text-xl" />
+                      <div>
+                        <p className="text-sm font-medium text-green-800">eSewa Digital Wallet</p>
+                        <p className="text-xs text-green-700 mt-1">
+                          You will be redirected to eSewa to complete your payment securely.
+                        </p>
+                        <div className="mt-2 flex items-center gap-2 text-xs text-green-700">
+                          <FiCheckCircle className="text-green-600" />
+                          <span>Instant payment confirmation</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-green-700">
+                          <FiCheckCircle className="text-green-600" />
+                          <span>Secure digital wallet payment</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1104,37 +1170,68 @@ export default function CheckoutPage() {
                     <span className="text-xs text-gray-500">We accept</span>
                     <FiCreditCard className="text-gray-600 text-xl" />
                     <FiDollarSign className="text-gray-600 text-xl" />
-                    <span className="text-xs font-medium text-gray-700">Card • PayPal • COD</span>
+                    <span className="text-xs font-medium text-gray-700">Card • PayPal • COD • eSewa</span>
                   </div>
                 </div>
               </div>
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting || cartItems.length === 0}
-                className={`w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-medium text-white transition-all duration-200 ${
-                  isSubmitting || cartItems.length === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02]"
-                }`}
-              >
-                {isSubmitting ? (
-                  <>
-                    <FiLoader className="animate-spin h-5 w-5" />
-                    Processing Order...
-                  </>
-                ) : (
-                  <>
-                    {paymentMethod === 'cod' ? (
-                      <FiDollarSign className="text-lg" />
-                    ) : (
-                      <FiShield className="text-lg" />
-                    )}
-                    {paymentMethod === 'cod' ? 'Place Order • Pay on Delivery' : `Place Order • $${grandTotal.toFixed(2)}`}
-                  </>
-                )}
-              </button>
+              {paymentMethod === "esewa" ? (
+                <div className="space-y-3">
+                  {orderId ? (
+                    <PaymentButton orderId={orderId} />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || !validateEsewaBasicInfo()}
+                      className={`w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-medium text-white transition-all duration-200 ${
+                        isSubmitting || !validateEsewaBasicInfo()
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-green-600 hover:bg-green-700 transform hover:scale-[1.02]"
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <FiLoader className="animate-spin h-5 w-5" />
+                          Creating Order...
+                        </>
+                      ) : (
+                        <>Continue to eSewa Payment</>
+                      )}
+                    </button>
+                  )}
+                  <p className="text-center text-xs text-gray-500">
+                    Click the button above to pay with eSewa
+                  </p>
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={isSubmitting || cartItems.length === 0}
+                  className={`w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-medium text-white transition-all duration-200 ${
+                    isSubmitting || cartItems.length === 0
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02]"
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <FiLoader className="animate-spin h-5 w-5" />
+                      Processing Order...
+                    </>
+                  ) : (
+                    <>
+                      {paymentMethod === 'cod' ? (
+                        <FiDollarSign className="text-lg" />
+                      ) : (
+                        <FiShield className="text-lg" />
+                      )}
+                      {paymentMethod === 'cod' ? 'Place Order • Pay on Delivery' : `Place Order • $${grandTotal.toFixed(2)}`}
+                    </>
+                  )}
+                </button>
+              )}
 
               <p className="text-center text-xs text-gray-500">
                 By placing your order, you agree to our Terms of Service and Privacy Policy

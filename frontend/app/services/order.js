@@ -13,6 +13,25 @@ export const orderService = {
     }
   },
 
+
+//esawa payment 
+  createEsewaPayment: async (orderId) => {
+  const response = await api.post("/payment/create", {
+    orderId,
+  });
+
+  return response.data;
+},
+
+verifyEsewaPayment: async (params) => {
+  const response = await api.get("/payment/verify", {
+    params,
+  });
+
+  return response.data;
+},
+
+
   // Get user's orders
   getUserOrders: async () => {
     try {
