@@ -5,6 +5,7 @@ const cors = require("cors");
 const connectDB = require("./Config/db");
 const cloudinary = require("./Config/cloudinary");
 
+
 // Routes
 const productRoutes = require("./Routes/Product");
 const authRoutes = require("./Routes/authRoutes");
@@ -12,16 +13,23 @@ const cartRoutes = require("./Routes/Cart");
 const orderRoutes = require("./Routes/Order"); 
 const reviewRoutes = require('./Routes/reviewRoutes');
 const userRoutes = require('./Routes/userRoutes');
+const paymentRoutes=require('./Routes/paymentRoutes')
+
+
+
+
 
 const app = express();
 
 dotenv.config();
 connectDB();
 
+
 // Middleware
 app.use(
   cors({
       origin:'https://e-commerce-theta-ruby-83.vercel.app',
+      origin:'http://localhost:3000',
     credentials: true,
   })
 );
@@ -37,6 +45,8 @@ app.use("/api/cart",cartRoutes);
 app.use("/api/orders",orderRoutes); 
 app.use('/api/reviews',reviewRoutes);
 app.use('/api/users',userRoutes);
+app.use('/api/payment',paymentRoutes)
+
 
 // Home Route
 app.get("/", (req, res) => {
@@ -57,8 +67,12 @@ app.use((req, res) => {
   });
 });
 
+// Add this debug middleware after body parser
+
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+      
 });

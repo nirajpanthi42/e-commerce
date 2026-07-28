@@ -65,7 +65,37 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  // eSewa Payment Fields
+  transactionUuid: {
+    type: String,
+    default: null
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'completed', 'failed', 'refunded'],
+    default: 'pending'
+  },
+ paymentDetails: {
+  transactionCode: {
+    type:String,
+    default:null
+  },
 
+  transactionUuid: {
+    type:String,
+    default:null
+  },
+
+  paymentDate:{
+    type:Date,
+    default:null
+  },
+
+  responseData:{
+    type:Object,
+    default:{}
+  }
+}
 }, {
   timestamps: true
 });
