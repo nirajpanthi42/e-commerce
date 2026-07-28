@@ -3,8 +3,6 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL:"https://e-commerce-3-23ca.onrender.com/api",
-  // You can also use localhost for development:
-   baseURL:"http://localhost:8000/api",
   headers: {
     'Content-Type': 'application/json',
   },
