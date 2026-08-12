@@ -372,9 +372,9 @@ export default function CheckoutPage() {
         setOrderComplete(true);
         
         if (paymentMethod === 'cod') {
-          success("Order placed successfully! Pay cash on delivery. 🎉");
+          success("Order placed successfully! Pay cash on delivery. ");
         } else {
-          success("Order placed successfully! 🎉");
+          success("Order placed successfully! ");
         }
         
         setTimeout(() => {
@@ -382,7 +382,7 @@ export default function CheckoutPage() {
         }, 5000);
       } else {
         // For eSewa, don't clear cart yet - wait for payment confirmation
-        success("Order created! Redirecting to eSewa payment... 🎉");
+        success("Order created! Redirecting to eSewa payment... ");
         // The PaymentButton component will handle the redirect
       }
 
@@ -401,9 +401,9 @@ export default function CheckoutPage() {
   // Loading state
   if (!isClient || cartLoading || authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <FiLoader className="text-4xl text-blue-600 animate-spin" />
+          <FiLoader className="text-4xl text-gray-700 animate-spin" />
           <p className="text-gray-600">Loading checkout...</p>
         </div>
       </div>
@@ -413,11 +413,11 @@ export default function CheckoutPage() {
   // Order complete
   if (orderComplete && orderData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center py-12 px-4">
-        <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+        <div className="max-w-2xl w-full bg-white rounded-2xl ">
           <div className="text-center">
-            <div className="bg-green-100 rounded-full p-4 w-24 h-24 mx-auto flex items-center justify-center">
-              <FiCheckCircle className="text-5xl text-green-600" />
+            <div className="bg-gray-100 rounded-full p-4 w-24 h-24 mx-auto flex items-center justify-center">
+              <FiCheckCircle className="text-5xl text-gray-800" />
             </div>
             <h2 className="mt-4 text-2xl font-bold text-gray-900">Order Placed Successfully!</h2>
             <p className="mt-2 text-gray-600">
@@ -425,25 +425,25 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          <div className="mt-6 p-4 bg-green-50 rounded-xl">
+          <div className="mt-6 p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-3 mb-3">
-              <FiCheckCircle className="text-green-600 text-2xl" />
-              <h3 className="font-semibold text-green-900">Order Confirmed!</h3>
+              <FiCheckCircle className="text-gray-800 text-2xl" />
+              <h3 className="font-semibold text-gray-900">Order Confirmed!</h3>
             </div>
             <div className="space-y-2 text-sm">
               <p><span className="font-medium">Order #:</span> {orderData._id?.slice(-8).toUpperCase()}</p>
               <p><span className="font-medium">Total:</span> ${orderData.totalAmount?.toFixed(2)}</p>
               <p><span className="font-medium">Estimated Delivery:</span> {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
               <p><span className="font-medium">Payment Method:</span> {
-                orderData.paymentMethod === 'card' ? 'Credit Card' : 
+           
                 orderData.paymentMethod === 'esewa' ? 'eSewa' :
                 orderData.paymentMethod === 'cod' ? 'Cash on Delivery' : 
                 'PayPal'
               }</p>
               {orderData.paymentMethod === 'cod' && (
-                <div className="mt-2 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <p className="text-sm text-yellow-800 font-medium">💵 Cash on Delivery</p>
-                  <p className="text-xs text-yellow-700">Please have the exact amount ready when the order arrives.</p>
+                <div className="mt-2 p-3 bg-gray-100 rounded-lg border border-gray-300">
+                  <p className="text-sm text-gray-800 font-medium">💵 Cash on Delivery</p>
+                  <p className="text-xs text-gray-700">Please have the exact amount ready when the order arrives.</p>
                 </div>
               )}
             </div>
@@ -452,7 +452,7 @@ export default function CheckoutPage() {
           <div className="mt-6 grid grid-cols-2 gap-3">
             <Link 
               href={`/orders/${orderId}`}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-center font-medium"
+              className="px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors text-center font-medium"
             >
               View Order Details
             </Link>
@@ -469,29 +469,28 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 sm:py-12">
+    <div className="min-h-screen bg-gray-50 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
-         
           <div className="flex items-center gap-3">
             <Link 
               href="/cart" 
-              className="p-2 bg-white rounded-xl shadow-sm hover:bg-gray-50 transition-colors"
+              className="p-2 bg-white rounded-xl  hover:bg-gray-100 transition-colors"
             >
-              <FiArrowLeft className="text-gray-600 text-xl" />
+              <FiArrowLeft className="text-gray-700 text-xl" />
             </Link>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Checkout</h1>
               <p className="text-sm text-gray-500">Complete your order securely</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 bg-white px-4 py-2 rounded-xl shadow-sm mt-3 sm:mt-0">
-            <FiShoppingBag className="text-blue-600" />
+          <div className="flex items-center gap-2 text-sm text-gray-700 bg-white px-4 py-2 rounded-xl  mt-3 sm:mt-0">
+            <FiShoppingBag className="text-gray-700" />
             <span className="font-medium">{itemCount}</span>
             <span>items</span>
             <span className="mx-1 text-gray-300">|</span>
-            <span className="font-medium text-blue-600">${grandTotal.toFixed(2)}</span>
+            <span className="font-medium text-gray-900">${grandTotal.toFixed(2)}</span>
           </div>
         </div>
 
@@ -500,14 +499,14 @@ export default function CheckoutPage() {
           <div className="lg:col-span-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Progress Steps */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="bg-white rounded-2xl p-6">
                 <div className="flex items-center justify-between">
                   {['Personal Info', 'Shipping', 'Payment', 'Confirm'].map((step, index) => (
                     <div key={step} className="flex items-center">
                       <div className="flex flex-col items-center">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                           index === 0 
-                            ? 'bg-blue-600 text-white' 
+                            ? 'bg-gray-900 text-white' 
                             : 'bg-gray-200 text-gray-500'
                         }`}>
                           {index + 1}
@@ -516,7 +515,7 @@ export default function CheckoutPage() {
                       </div>
                       {index < 3 && (
                         <div className={`w-12 sm:w-16 h-0.5 mx-2 ${
-                          index === 0 ? 'bg-blue-600' : 'bg-gray-200'
+                          index === 0 ? 'bg-gray-900' : 'bg-gray-200'
                         }`} />
                       )}
                     </div>
@@ -525,9 +524,9 @@ export default function CheckoutPage() {
               </div>
 
               {/* Personal Information */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="bg-white rounded-2xl  p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <FiUser className="text-blue-600" />
+                  <FiUser className="text-gray-700" />
                   Personal Information
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -544,9 +543,9 @@ export default function CheckoutPage() {
                       className={`w-full px-4 py-2.5 border ${
                         errors.firstName && touched.firstName 
                           ? 'border-red-500 ring-2 ring-red-200' 
-                          : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                          : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                       } rounded-lg focus:outline-none transition-all`}
-                      placeholder="John"
+                      placeholder="Ram"
                     />
                     {errors.firstName && touched.firstName && (
                       <p className="mt-1 text-sm text-red-500">{errors.firstName}</p>
@@ -565,9 +564,9 @@ export default function CheckoutPage() {
                       className={`w-full px-4 py-2.5 border ${
                         errors.lastName && touched.lastName 
                           ? 'border-red-500 ring-2 ring-red-200' 
-                          : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                          : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                       } rounded-lg focus:outline-none transition-all`}
-                      placeholder="Doe"
+                      placeholder="sharma"
                     />
                     {errors.lastName && touched.lastName && (
                       <p className="mt-1 text-sm text-red-500">{errors.lastName}</p>
@@ -588,9 +587,9 @@ export default function CheckoutPage() {
                         className={`w-full pl-10 pr-4 py-2.5 border ${
                           errors.email && touched.email 
                             ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                         } rounded-lg focus:outline-none transition-all`}
-                        placeholder="john@example.com"
+                        placeholder="ram@example.com"
                       />
                     </div>
                     {errors.email && touched.email && (
@@ -612,7 +611,7 @@ export default function CheckoutPage() {
                         className={`w-full pl-10 pr-4 py-2.5 border ${
                           errors.phone && touched.phone 
                             ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                         } rounded-lg focus:outline-none transition-all`}
                         placeholder="+1 (555) 000-0000"
                       />
@@ -625,9 +624,9 @@ export default function CheckoutPage() {
               </div>
 
               {/* Shipping Address */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="bg-white rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <FiMapPin className="text-blue-600" />
+                  <FiMapPin className="text-gray-700" />
                   Shipping Address
                 </h2>
                 <div className="space-y-4">
@@ -644,7 +643,7 @@ export default function CheckoutPage() {
                       className={`w-full px-4 py-2.5 border ${
                         errors.address && touched.address 
                           ? 'border-red-500 ring-2 ring-red-200' 
-                          : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                          : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                       } rounded-lg focus:outline-none transition-all`}
                       placeholder="123 Main Street"
                     />
@@ -661,7 +660,7 @@ export default function CheckoutPage() {
                       name="apartment"
                       value={formData.apartment}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                       placeholder="Apt 4B, Suite 200"
                     />
                   </div>
@@ -679,7 +678,7 @@ export default function CheckoutPage() {
                         className={`w-full px-4 py-2.5 border ${
                           errors.city && touched.city 
                             ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                         } rounded-lg focus:outline-none transition-all`}
                         placeholder="New York"
                       />
@@ -700,7 +699,7 @@ export default function CheckoutPage() {
                         className={`w-full px-4 py-2.5 border ${
                           errors.state && touched.state 
                             ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                         } rounded-lg focus:outline-none transition-all`}
                         placeholder="NY"
                       />
@@ -721,7 +720,7 @@ export default function CheckoutPage() {
                         className={`w-full px-4 py-2.5 border ${
                           errors.zipCode && touched.zipCode 
                             ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                         } rounded-lg focus:outline-none transition-all`}
                         placeholder="10001"
                       />
@@ -737,7 +736,7 @@ export default function CheckoutPage() {
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                       >
                         <option value="United States">United States</option>
                         <option value="Canada">Canada</option>
@@ -760,7 +759,7 @@ export default function CheckoutPage() {
                       value={formData.deliveryNotes}
                       onChange={handleInputChange}
                       rows="2"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all resize-none"
                       placeholder="Special instructions for delivery..."
                     />
                   </div>
@@ -768,9 +767,9 @@ export default function CheckoutPage() {
               </div>
 
               {/* Billing Address */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="bg-white rounded-2xl  p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <FiHome className="text-blue-600" />
+                  <FiHome className="text-gray-700" />
                   Billing Address
                 </h2>
                 <div className="mb-4">
@@ -779,7 +778,7 @@ export default function CheckoutPage() {
                       type="checkbox"
                       checked={sameAsShipping}
                       onChange={(e) => setSameAsShipping(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 focus:ring-blue-500 rounded"
+                      className="w-4 h-4 text-gray-900 focus:ring-gray-500 rounded"
                     />
                     <span className="text-sm text-gray-700">Same as shipping address</span>
                   </label>
@@ -798,7 +797,7 @@ export default function CheckoutPage() {
                           value={billingFormData.firstName}
                           onChange={handleBillingChange}
                           onBlur={handleBlur}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                           placeholder="John"
                         />
                       </div>
@@ -812,7 +811,7 @@ export default function CheckoutPage() {
                           value={billingFormData.lastName}
                           onChange={handleBillingChange}
                           onBlur={handleBlur}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                           placeholder="Doe"
                         />
                       </div>
@@ -830,7 +829,7 @@ export default function CheckoutPage() {
                         className={`w-full px-4 py-2.5 border ${
                           errors.billingAddress && touched.billingAddress 
                             ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                            : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                         } rounded-lg focus:outline-none transition-all`}
                         placeholder="123 Main Street"
                       />
@@ -852,7 +851,7 @@ export default function CheckoutPage() {
                           className={`w-full px-4 py-2.5 border ${
                             errors.billingCity && touched.billingCity 
                               ? 'border-red-500 ring-2 ring-red-200' 
-                              : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                           } rounded-lg focus:outline-none transition-all`}
                           placeholder="New York"
                         />
@@ -873,7 +872,7 @@ export default function CheckoutPage() {
                           className={`w-full px-4 py-2.5 border ${
                             errors.billingState && touched.billingState 
                               ? 'border-red-500 ring-2 ring-red-200' 
-                              : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                           } rounded-lg focus:outline-none transition-all`}
                           placeholder="NY"
                         />
@@ -894,7 +893,7 @@ export default function CheckoutPage() {
                           className={`w-full px-4 py-2.5 border ${
                             errors.billingZip && touched.billingZip 
                               ? 'border-red-500 ring-2 ring-red-200' 
-                              : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
+                              : 'border-gray-300 focus:ring-2 focus:ring-gray-500'
                           } rounded-lg focus:outline-none transition-all`}
                           placeholder="10001"
                         />
@@ -910,7 +909,7 @@ export default function CheckoutPage() {
                           name="billingCountry"
                           value={billingFormData.country}
                           onChange={handleBillingChange}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all"
                         >
                           <option value="United States">United States</option>
                           <option value="Canada">Canada</option>
@@ -929,51 +928,23 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="bg-white rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <FiCreditCard className="text-blue-600" />
+                  <FiCreditCard className="text-gray-700" />
                   Payment Method
                 </h2>
                 
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                      paymentMethod === "card" 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="card"
-                        checked={paymentMethod === "card"}
-                        onChange={() => setPaymentMethod("card")}
-                        className="text-blue-600 focus:ring-blue-500"
-                      />
-                      <FiCreditCard className={paymentMethod === "card" ? 'text-blue-600' : 'text-gray-600'} />
-                      <span className="text-sm font-medium">Card</span>
-                    </label>
+                   
                     
-                    <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                      paymentMethod === "paypal" 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-blue-300'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="paypal"
-                        checked={paymentMethod === "paypal"}
-                        onChange={() => setPaymentMethod("paypal")}
-                        className="text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm font-medium">PayPal</span>
-                    </label>
+                   
+                      
 
                     <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
                       paymentMethod === "cod" 
-                        ? 'border-blue-500 bg-blue-50' 
-                        : 'border-gray-200 hover:border-blue-300'
+                        ? 'border-gray-900 bg-gray-100' 
+                        : ''
                     }`}>
                       <input
                         type="radio"
@@ -981,152 +952,44 @@ export default function CheckoutPage() {
                         value="cod"
                         checked={paymentMethod === "cod"}
                         onChange={() => setPaymentMethod("cod")}
-                        className="text-blue-600 focus:ring-blue-500"
+                        className="text-gray-900 focus:ring-gray-500"
                       />
-                      <FiDollarSign className={paymentMethod === "cod" ? 'text-blue-600' : 'text-gray-600'} />
+                      <FiDollarSign className={paymentMethod === "cod" ? 'text-gray-900' : 'text-gray-600'} />
                       <span className="text-sm font-medium">COD</span>
                     </label>
 
-                    {/* eSewa Payment Option */}
-                    <label className={`flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer transition-all ${
-                      paymentMethod === "esewa" 
-                        ? 'border-green-500 bg-green-50' 
-                        : 'border-gray-200 hover:border-green-300'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="esewa"
-                        checked={paymentMethod === "esewa"}
-                        onChange={() => setPaymentMethod("esewa")}
-                        className="text-green-600 focus:ring-green-500"
-                      />
-                      <span className="text-sm font-medium text-green-600">eSewa</span>
-                    </label>
+                  
+                   {/* eSewa Payment Option */}
+<label className={`flex items-center gap-2 p-3 rounded-lg cursor-pointer transition-all bg-green-500 hover:bg-green-600`}>
+  <input
+    type="radio"
+    name="paymentMethod"
+    value="esewa"
+    checked={paymentMethod === "esewa"}
+    onChange={() => setPaymentMethod("esewa")}
+    className="text-gray-900 focus:ring-green-900"
+  />
+  <span className="text-sm font-medium text-white">eSewa</span>
+</label>
                   </div>
 
-                  {paymentMethod === "card" && (
-                    <div className="space-y-4 mt-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Card Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="cardNumber"
-                          value={cardDetails.cardNumber}
-                          onChange={handleCardChange}
-                          onBlur={handleBlur}
-                          className={`w-full px-4 py-2.5 border ${
-                            errors.cardNumber && touched.cardNumber 
-                              ? 'border-red-500 ring-2 ring-red-200' 
-                              : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
-                          } rounded-lg focus:outline-none transition-all font-mono`}
-                          placeholder="1234 5678 9012 3456"
-                          maxLength="19"
-                        />
-                        {errors.cardNumber && touched.cardNumber && (
-                          <p className="mt-1 text-sm text-red-500">{errors.cardNumber}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Name on Card <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="cardName"
-                          value={cardDetails.cardName}
-                          onChange={handleCardChange}
-                          onBlur={handleBlur}
-                          className={`w-full px-4 py-2.5 border ${
-                            errors.cardName && touched.cardName 
-                              ? 'border-red-500 ring-2 ring-red-200' 
-                              : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
-                          } rounded-lg focus:outline-none transition-all`}
-                          placeholder="John Doe"
-                        />
-                        {errors.cardName && touched.cardName && (
-                          <p className="mt-1 text-sm text-red-500">{errors.cardName}</p>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Expiry Date <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="expiryDate"
-                            value={cardDetails.expiryDate}
-                            onChange={handleCardChange}
-                            onBlur={handleBlur}
-                            className={`w-full px-4 py-2.5 border ${
-                              errors.expiryDate && touched.expiryDate 
-                                ? 'border-red-500 ring-2 ring-red-200' 
-                                : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
-                            } rounded-lg focus:outline-none transition-all font-mono`}
-                            placeholder="MM/YY"
-                            maxLength="5"
-                          />
-                          {errors.expiryDate && touched.expiryDate && (
-                            <p className="mt-1 text-sm text-red-500">{errors.expiryDate}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            CVV <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="password"
-                            name="cvv"
-                            value={cardDetails.cvv}
-                            onChange={handleCardChange}
-                            onBlur={handleBlur}
-                            className={`w-full px-4 py-2.5 border ${
-                              errors.cvv && touched.cvv 
-                                ? 'border-red-500 ring-2 ring-red-200' 
-                                : 'border-gray-300 focus:ring-2 focus:ring-blue-500'
-                            } rounded-lg focus:outline-none transition-all font-mono`}
-                            placeholder="123"
-                            maxLength="4"
-                          />
-                          {errors.cvv && touched.cvv && (
-                            <p className="mt-1 text-sm text-red-500">{errors.cvv}</p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {paymentMethod === "paypal" && (
-                    <div className="p-4 bg-blue-50 rounded-lg flex items-start gap-3">
-                      <FiInfo className="text-blue-600 flex-shrink-0 mt-0.5 text-xl" />
-                      <div>
-                        <p className="text-sm text-blue-800">
-                          You will be redirected to PayPal to complete your payment securely.
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1">
-                          You don't need a PayPal account to use this method.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
+                
+                     
+                
                   {paymentMethod === "cod" && (
-                    <div className="p-4 bg-green-50 rounded-lg flex items-start gap-3 border border-green-200">
-                      <FiDollarSign className="text-green-600 flex-shrink-0 mt-0.5 text-xl" />
+                    <div className="p-4 bg-gray-100 rounded-lg flex items-start gap-3 border border-gray-300">
+                      <FiDollarSign className="text-gray-700 flex-shrink-0 mt-0.5 text-xl" />
                       <div>
-                        <p className="text-sm font-medium text-green-800">Cash on Delivery</p>
-                        <p className="text-xs text-green-700 mt-1">
+                        <p className="text-sm font-medium text-gray-800">Cash on Delivery</p>
+                        <p className="text-xs text-gray-700 mt-1">
                           Pay with cash when your order arrives. No payment needed now.
                         </p>
-                        <div className="mt-2 flex items-center gap-2 text-xs text-green-700">
-                          <FiCheckCircle className="text-green-600" />
+                        <div className="mt-2 flex items-center gap-2 text-xs text-gray-700">
+                          <FiCheckCircle className="text-gray-700" />
                           <span>No additional fees for COD</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-green-700">
-                          <FiCheckCircle className="text-green-600" />
+                        <div className="flex items-center gap-2 text-xs text-gray-700">
+                          <FiCheckCircle className="text-gray-700" />
                           <span>Pay only when you receive the order</span>
                         </div>
                       </div>
@@ -1135,19 +998,19 @@ export default function CheckoutPage() {
 
                   {/* eSewa Payment Info */}
                   {paymentMethod === "esewa" && (
-                    <div className="p-4 bg-green-50 rounded-lg flex items-start gap-3 border border-green-200">
-                      <FiShield className="text-green-600 flex-shrink-0 mt-0.5 text-xl" />
+                    <div className="p-4 bg-gray-100 rounded-lg flex items-start gap-3 border border-gray-300">
+                      <FiShield className="text-gray-700 flex-shrink-0 mt-0.5 text-xl" />
                       <div>
-                        <p className="text-sm font-medium text-green-800">eSewa Digital Wallet</p>
-                        <p className="text-xs text-green-700 mt-1">
+                        <p className="text-sm font-medium text-gray-800">eSewa Digital Wallet</p>
+                        <p className="text-xs text-gray-700 mt-1">
                           You will be redirected to eSewa to complete your payment securely.
                         </p>
-                        <div className="mt-2 flex items-center gap-2 text-xs text-green-700">
-                          <FiCheckCircle className="text-green-600" />
+                        <div className="mt-2 flex items-center gap-2 text-xs text-gray-700">
+                          <FiCheckCircle className="text-gray-700" />
                           <span>Instant payment confirmation</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-green-700">
-                          <FiCheckCircle className="text-green-600" />
+                        <div className="flex items-center gap-2 text-xs text-gray-700">
+                          <FiCheckCircle className="text-gray-700" />
                           <span>Secure digital wallet payment</span>
                         </div>
                       </div>
@@ -1157,10 +1020,10 @@ export default function CheckoutPage() {
               </div>
 
               {/* Security Section */}
-              <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="bg-white rounded-2xl p-6">
                 <div className="flex flex-wrap items-center gap-4 justify-between p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <FiLock className="text-green-600 text-xl flex-shrink-0" />
+                    <FiLock className="text-gray-700 text-xl flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-900">Secure Checkout</p>
                       <p className="text-xs text-gray-600">256-bit SSL encryption</p>
@@ -1188,7 +1051,7 @@ export default function CheckoutPage() {
                       className={`w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-medium text-white transition-all duration-200 ${
                         isSubmitting || !validateEsewaBasicInfo()
                           ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-600 hover:bg-green-700 transform hover:scale-[1.02]"
+                          : "bg-gray-900 hover:bg-gray-800 transform hover:scale-[1.02]"
                       }`}
                     >
                       {isSubmitting ? (
@@ -1212,7 +1075,7 @@ export default function CheckoutPage() {
                   className={`w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-xl shadow-lg text-base font-medium text-white transition-all duration-200 ${
                     isSubmitting || cartItems.length === 0
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02]"
+                      : "bg-gray-900 hover:bg-gray-800 transform hover:scale-[1.02]"
                   }`}
                 >
                   {isSubmitting ? (
@@ -1241,9 +1104,9 @@ export default function CheckoutPage() {
 
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-4 mt-6 lg:mt-0">
-            <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-24">
+            <div className="bg-white rounded-2xl  p-6 sticky top-24">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <FiShoppingBag className="text-blue-600" />
+                <FiShoppingBag className="text-gray-700" />
                 Order Summary
               </h2>
               
@@ -1265,7 +1128,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-blue-600">${grandTotal.toFixed(2)}</span>
+                    <span className="text-gray-900">${grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -1303,18 +1166,18 @@ export default function CheckoutPage() {
 
               {/* Delivery Info */}
               <div className="mt-6 space-y-3">
-                <div className="p-4 bg-blue-50 rounded-xl flex items-start gap-3">
-                  <FiTruck className="text-blue-600 flex-shrink-0 mt-0.5 text-xl" />
+                <div className="p-4 bg-gray-100 rounded-xl flex items-start gap-3">
+                  <FiTruck className="text-gray-700 flex-shrink-0 mt-0.5 text-xl" />
                   <div>
-                    <p className="text-sm font-medium text-blue-900">Free Shipping</p>
-                    <p className="text-xs text-blue-700">On orders over $100</p>
+                    <p className="text-sm font-medium text-gray-900">Free Shipping</p>
+                    <p className="text-xs text-gray-700">On orders over $100</p>
                   </div>
                 </div>
-                <div className="p-4 bg-purple-50 rounded-xl flex items-start gap-3">
-                  <FiCalendar className="text-purple-600 flex-shrink-0 mt-0.5 text-xl" />
+                <div className="p-4 bg-gray-100 rounded-xl flex items-start gap-3">
+                  <FiCalendar className="text-gray-700 flex-shrink-0 mt-0.5 text-xl" />
                   <div>
-                    <p className="text-sm font-medium text-purple-900">Estimated Delivery</p>
-                    <p className="text-xs text-purple-700">
+                    <p className="text-sm font-medium text-gray-900">Estimated Delivery</p>
+                    <p className="text-xs text-gray-700">
                       {new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -1327,10 +1190,10 @@ export default function CheckoutPage() {
               </div>
 
               {!user && (
-                <div className="mt-4 p-3 bg-yellow-50 rounded-lg flex items-start gap-2">
-                  <FiInfo className="text-yellow-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-yellow-800">
-                    Please <Link href="/login?redirect=/checkout" className="font-semibold underline hover:text-yellow-900">login</Link> to complete your order
+                <div className="mt-4 p-3 bg-gray-100 rounded-lg flex items-start gap-2">
+                  <FiInfo className="text-gray-700 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-800">
+                    Please <Link href="/login?redirect=/checkout" className="font-semibold underline hover:text-gray-900">login</Link> to complete your order
                   </p>
                 </div>
               )}

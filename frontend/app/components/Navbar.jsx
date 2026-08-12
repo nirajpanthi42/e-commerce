@@ -22,7 +22,7 @@ import { MdAdminPanelSettings } from "react-icons/md";
 export default function Navbar({
   search = "",
   setSearch = () => {},
-  products = [], // receive products from parent for suggestions
+  products = [],
 }) {
   const {
     user,
@@ -35,13 +35,12 @@ export default function Navbar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // --- Search Suggestions State (simplified) ---
+  // --- Search Suggestions State ---
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const suggestionRefs = useRef([]);
   const debounceTimer = useRef(null);
-  // ---------------------------------
 
   const cartItemCount = getCartCount ? getCartCount() : 0;
 
@@ -95,7 +94,7 @@ export default function Navbar({
     logout();
   };
 
-  // --- Simplified Search Suggestions Logic (only product names) ---
+  // --- Simplified Search Suggestions Logic ---
   const updateSuggestions = useCallback((query) => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -112,7 +111,7 @@ export default function Navbar({
         .filter(product => 
           product.name?.toLowerCase().includes(query.toLowerCase())
         )
-        .slice(0, 8); // limit to 8 suggestions
+        .slice(0, 8);
 
       setSuggestions(filtered);
       setShowSuggestions(filtered.length > 0);
@@ -159,18 +158,17 @@ export default function Navbar({
     setShowSuggestions(false);
     window.location.href = `/products/${product._id}`;
   };
-  // ---------------------------------
 
   return (
-    <nav className="bg-white shadow-md px-4 sm:px-6 md:px-8 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 md:gap-6 sticky top-0 z-50">
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-blue-600 flex-shrink-0">
-        <FaStore className="text-2xl sm:text-3xl" />
+    <nav className="bg-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4 md:gap-6 sticky top-0 z-50 border-b border-gray-200">
+      {/* Logo – monochrome */}
+      <Link href="/" className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-gray-800 flex-shrink-0">
+        <FaStore className="text-2xl sm:text-3xl text-gray-700" />
         <span className="hidden xs:inline">E-Commerce</span>
         <span className="xs:hidden">Shop</span>
       </Link>
 
-      {/* Desktop Search Bar with Simplified Suggestions */}
+      {/* Desktop Search Bar */}
       <div id="search-container" className="hidden sm:block flex-1 max-w-xl relative min-w-[150px]">
         <input
           type="text"
@@ -183,7 +181,7 @@ export default function Navbar({
               setShowSuggestions(true);
             }
           }}
-          className="w-full border border-gray-300 rounded-full py-1.5 sm:py-2 pl-8 sm:pl-10 pr-8 sm:pr-10 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full border border-gray-300 rounded-full py-1.5 sm:py-2 pl-8 sm:pl-10 pr-8 sm:pr-10 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-gray-500 transition bg-gray-50 text-gray-800 placeholder-gray-500"
         />
         <FiSearch className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm sm:text-base" />
         {search && (
@@ -192,21 +190,21 @@ export default function Navbar({
               setSearch("");
               setShowSuggestions(false);
             }}
-            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors"
+            className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
           >
             <FiX className="text-sm sm:text-base" />
           </button>
         )}
 
-        {/* Suggestions Dropdown – Only Product Names */}
+        {/* Suggestions Dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-72 overflow-y-auto z-50 animate-slideDown">
+          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 max-h-72 overflow-y-auto z-50 animate-slideDown">
             {suggestions.map((product, index) => (
               <div
                 key={product._id}
                 ref={el => suggestionRefs.current[index] = el}
-                className={`px-4 py-2.5 cursor-pointer transition-colors hover:bg-blue-50 ${
-                  index === selectedIndex ? 'bg-blue-50' : ''
+                className={`px-4 py-2.5 cursor-pointer transition-colors hover:bg-gray-100 ${
+                  index === selectedIndex ? 'bg-gray-100' : ''
                 }`}
                 onClick={() => handleSuggestionClick(product)}
                 onMouseEnter={() => setSelectedIndex(index)}
@@ -220,7 +218,7 @@ export default function Navbar({
         )}
       </div>
 
-      {/* Mobile Search with Simplified Suggestions */}
+      {/* Mobile Search */}
       <div className="sm:hidden w-full order-last mt-1 relative" id="search-container-mobile">
         <input
           type="text"
@@ -233,7 +231,7 @@ export default function Navbar({
               setShowSuggestions(true);
             }
           }}
-          className="w-full border border-gray-300 rounded-full py-1.5 pl-8 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="w-full border border-gray-300 rounded-full py-1.5 pl-8 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 transition bg-gray-50 text-gray-800 placeholder-gray-500"
         />
         <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
         {search && (
@@ -242,19 +240,19 @@ export default function Navbar({
               setSearch("");
               setShowSuggestions(false);
             }}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-500 transition-colors"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
           >
             <FiX className="text-sm" />
           </button>
         )}
 
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 overflow-y-auto z-50 animate-slideDown">
+          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-200 max-h-60 overflow-y-auto z-50 animate-slideDown">
             {suggestions.map((product, index) => (
               <div
                 key={product._id}
-                className={`px-4 py-2.5 cursor-pointer transition-colors hover:bg-blue-50 ${
-                  index === selectedIndex ? 'bg-blue-50' : ''
+                className={`px-4 py-2.5 cursor-pointer transition-colors hover:bg-gray-100 ${
+                  index === selectedIndex ? 'bg-gray-100' : ''
                 }`}
                 onClick={() => handleSuggestionClick(product)}
                 onMouseEnter={() => setSelectedIndex(index)}
@@ -273,13 +271,13 @@ export default function Navbar({
         {/* Cart Icon */}
         <Link 
           href="/cart" 
-          className="relative group flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-colors duration-200 p-1.5 rounded-lg hover:bg-blue-50"
+          className="relative group flex items-center gap-1 text-gray-700 hover:text-gray-900 transition-colors duration-200 p-1.5 rounded-lg hover:bg-gray-100"
           aria-label="Shopping cart"
         >
           <div className="relative">
             <FiShoppingCart className="text-2xl sm:text-3xl" />
             {cartItemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] sm:text-xs font-bold rounded-full min-w-[18px] sm:min-w-[20px] h-[18px] sm:h-[20px] flex items-center justify-center px-1 shadow-md animate-pulse">
+              <span className="absolute -top-2 -right-2 bg-gray-800 text-white text-[10px] sm:text-xs font-bold rounded-full min-w-[18px] sm:min-w-[20px] h-[18px] sm:h-[20px] flex items-center justify-center px-1">
                 {cartItemCount > 99 ? '99+' : cartItemCount}
               </span>
             )}
@@ -290,7 +288,7 @@ export default function Navbar({
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="flex items-center gap-1.5 sm:gap-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-blue-50"
+              className="flex items-center gap-1.5 sm:gap-2 text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-gray-100"
               aria-label="User menu"
               aria-expanded={isDropdownOpen}
             >
@@ -308,10 +306,10 @@ export default function Navbar({
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50 animate-slideDown">
+              <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white border border-gray-200 py-1.5 z-50 animate-slideDown">
                 <div className="px-4 py-2.5 border-b border-gray-100">
                   <p className="text-sm font-semibold text-gray-800 truncate flex items-center gap-2">
-                    <FiUser className="text-blue-500" />
+                    <FiUser className="text-gray-600" />
                     {user?.name || user?.email}
                   </p>
                   {user?.email && user?.name !== user?.email && (
@@ -321,7 +319,7 @@ export default function Navbar({
                     </p>
                   )}
                   {isAdmin && (
-                    <span className="inline-flex items-center gap-1 mt-1.5 bg-purple-100 text-purple-700 text-[10px] font-medium px-2 py-0.5 rounded-full">
+                    <span className="inline-flex items-center gap-1 mt-1.5 bg-gray-200 text-gray-800 text-[10px] font-medium px-2 py-0.5 rounded-full">
                       <MdAdminPanelSettings className="text-xs" />
                       Admin
                     </span>
@@ -331,7 +329,7 @@ export default function Navbar({
                 <div className="py-1">
                   <Link
                     href="/orders"
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     <FiShoppingBag className="text-base" />
@@ -340,7 +338,7 @@ export default function Navbar({
 
                   <Link
                     href="/cart"
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
                     onClick={() => setIsDropdownOpen(false)}
                   >
                     <FiShoppingCart className="text-base" />
@@ -350,7 +348,7 @@ export default function Navbar({
                   {isAdmin && (
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150"
                       onClick={() => setIsDropdownOpen(false)}
                     >
                       <FiLayout className="text-base" />
@@ -363,7 +361,7 @@ export default function Navbar({
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 font-medium"
+                  className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-150 font-medium"
                 >
                   <FiLogOut className="text-base" />
                   Logout
@@ -375,18 +373,18 @@ export default function Navbar({
           <>
             <Link
               href="/login"
-              className="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base transition duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
+              className="flex items-center gap-1.5 bg-gray-800 hover:bg-gray-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base transition duration-200 whitespace-nowrap"
             >
               <FiUser className="text-sm sm:text-base" />
-              <span className=" xs:inline">Login</span>
+              <span className="xs:inline">Login</span>
             </Link>
 
             <Link
               href="/register"
-              className="flex items-center gap-1.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base transition duration-200 whitespace-nowrap shadow-sm hover:shadow-md"
+              className="flex items-center gap-1.5 bg-gray-600 hover:bg-gray-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base transition duration-200 whitespace-nowrap"
             >
               <FiUser className="text-sm sm:text-base" />
-              <span className=" xs:inline">Signup</span>
+              <span className="xs:inline">Signup</span>
             </Link>
           </>
         )}
@@ -406,19 +404,6 @@ export default function Navbar({
         
         .animate-slideDown {
           animation: slideDown 0.2s ease-out;
-        }
-
-        @keyframes pulse {
-          0%, 100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.05);
-          }
-        }
-
-        .animate-pulse {
-          animation: pulse 2s ease-in-out infinite;
         }
 
         @media (max-width: 400px) {

@@ -31,7 +31,6 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
         res = await createReview(data);
       }
       onSuccess(res.data);
-      // Reset form if not editing
       if (!isEdit) {
         setRating(0);
         setComment('');
@@ -44,14 +43,14 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
     }
   };
 
-  // Star rating UI (simplified)
+  // Star rating – kept yellow
   const renderStars = () => {
     return [1, 2, 3, 4, 5].map((star) => (
       <button
         key={star}
         type="button"
         onClick={() => setRating(star)}
-        className={`text-2xl ${star <= rating ? 'text-yellow-500' : 'text-gray-300'}`}
+        className={`text-2xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
       >
         ★
       </button>
@@ -59,7 +58,7 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border p-4 rounded-lg mt-4 text-black ">
+    <form onSubmit={handleSubmit} className="p-4 mt-4 bg-white text-gray-800">
       <h4 className="font-medium mb-2">
         {isEdit ? 'Edit Your Review' : 'Write a Review'}
       </h4>
@@ -68,7 +67,7 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         placeholder="Share your experience..."
-        className="w-full border rounded p-2"
+        className="w-full p-2 bg-gray-100 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-400"
         rows="3"
         disabled={loading}
       />
@@ -76,7 +75,7 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
       <div className="flex gap-2 mt-2">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          className="bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800 disabled:opacity-50 transition-colors"
           disabled={loading}
         >
           {loading ? 'Submitting...' : isEdit ? 'Update' : 'Submit'}
@@ -85,7 +84,7 @@ const ReviewForm = ({ productId, existingReview, onSuccess, onCancel }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="bg-gray-300 px-4 py-2 rounded"
+            className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
           >
             Cancel
           </button>

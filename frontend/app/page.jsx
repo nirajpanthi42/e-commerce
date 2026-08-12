@@ -59,15 +59,11 @@ export default function Home() {
     }
   };
 
-  // Filter products based on search input
   const filteredProducts = products.filter((product) =>
     product.name?.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Check if user is currently searching
   const isSearching = search.trim() !== "";
-
-  // Determine which products to show in the latest section
   const latestDisplayProducts = isSearching ? filteredProducts.slice(0, 4) : latestProducts;
 
   const truncateText = (text, maxLength) => {
@@ -75,7 +71,6 @@ export default function Home() {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  // Banner navigation
   const prevBanner = () => {
     setBannerIndex((prev) => (prev === 0 ? featuredProducts.length - 1 : prev - 1));
   };
@@ -83,7 +78,6 @@ export default function Home() {
     setBannerIndex((prev) => (prev + 1) % featuredProducts.length);
   };
 
-  // Product bar scroll
   const scrollLeft = () => {
     if (productScrollRef.current) {
       productScrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
@@ -111,13 +105,12 @@ export default function Home() {
       
       <Navbar search={search} setSearch={setSearch} />
 
-      {/* Hide Banner when searching */}
       {!isSearching && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 relative">
           {loading ? (
             <div className="h-[300px] sm:h-[340px] lg:h-[380px] bg-gray-200 rounded-2xl animate-pulse"></div>
           ) : featuredProducts.length > 0 ? (
-            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+            <div className="relative overflow-hidden rounded-2xl border border-gray-300">
               <div 
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{ transform: `translateX(-${bannerIndex * 100}%)` }}
@@ -138,35 +131,35 @@ export default function Home() {
 
                     <div className="relative z-10 p-6 sm:p-8 md:p-10 flex flex-col justify-between h-full">
                       <div>
-                        <span className="inline-block bg-white/20 backdrop-blur-md text-white text-xs sm:text-sm font-bold px-4 py-1.5 rounded-full mb-4 border border-white/20">
+                        <span className="inline-block bg-white/20 text-white text-xs sm:text-sm px-4 py-1.5 rounded-full mb-4 border border-white/20">
                           {index === 0 ? "AVAILABLE NOW" : index === 1 ? "GET IT AT" : "FEATURED"}
                         </span>
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-2">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-2">
                           {truncateText(product.name, 30)}
                         </h2>
                         {product.category && (
-                          <p className="text-lg sm:text-xl text-white/90 font-medium">
+                          <p className="text-lg sm:text-xl text-white/90">
                             {product.category}
                           </p>
                         )}
                       </div>
 
                       <div className="mt-4">
-                        <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+                        <p className="text-3xl sm:text-4xl md:text-5xl text-white mb-2">
                           ${Number(product.price).toFixed(2)}
                         </p>
                         {product.discount && (
-                          <p className="text-sm sm:text-base text-yellow-300 font-semibold">
+                          <p className="text-sm sm:text-base text-yellow-300">
                             {product.discount}% OFF
                           </p>
                         )}
                         {product.stock > 0 && product.stock <= 5 && (
-                          <p className="text-sm sm:text-base text-orange-300 font-medium">
+                          <p className="text-sm sm:text-base text-orange-300">
                             Only {product.stock} left in stock!
                           </p>
                         )}
                         <Link href={`/products/${product._id}`}>
-                          <button className="mt-4 sm:mt-5 bg-white text-gray-900 hover:bg-gray-100 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 shadow-lg">
+                          <button className="mt-4 sm:mt-5 bg-white text-black hover:bg-gray-100 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base transition-colors duration-300 border border-gray-300">
                             Shop Now →
                           </button>
                         </Link>
@@ -176,10 +169,10 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Banner Navigation Arrows */}
+              {/* Banner Navigation Arrows – no blur, no scale */}
               <button
                 onClick={prevBanner}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 backdrop-blur-sm text-white p-2 rounded-full z-20 transition-all duration-300 hover:scale-110"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white/40 hover:bg-white/60 text-white p-2 rounded-full z-20 transition-colors duration-300"
                 aria-label="Previous banner"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +181,7 @@ export default function Home() {
               </button>
               <button
                 onClick={nextBanner}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 backdrop-blur-sm text-white p-2 rounded-full z-20 transition-all duration-300 hover:scale-110"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white/40 hover:bg-white/60 text-white p-2 rounded-full z-20 transition-colors duration-300"
                 aria-label="Next banner"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,13 +206,12 @@ export default function Home() {
         </section>
       )}
 
-      {/* Hide Product Scroll Bar when searching */}
       {!isSearching && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden py-2">
           <div className="relative flex items-center">
             <button
               onClick={scrollLeft}
-              className="absolute left-0 z-10 bg-white/90 hover:bg-white shadow-lg p-2 rounded-full transition-all duration-300 hover:scale-110 border border-gray-200"
+              className="absolute left-0 z-10 bg-white/90 hover:bg-white border border-gray-300 p-2 rounded-full transition-colors duration-300"
               aria-label="Scroll left"
             >
               <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +229,7 @@ export default function Home() {
                   key={product._id}
                   className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[100px] sm:min-w-[120px] group cursor-pointer"
                 >
-                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shadow-md border-2 border-gray-200 group-hover:border-blue-500 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border border-gray-300 group-hover:border-gray-600 transition-colors duration-300">
                     <img
                       src={product.image || "https://via.placeholder.com/100/4F46E5/FFFFFF?text=Product"}
                       alt={product.name}
@@ -247,13 +239,13 @@ export default function Home() {
                       }}
                     />
                     {product.discount && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] px-1.5 py-0.5 rounded-full font-bold">
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[7px] px-1.5 py-0.5 rounded-full">
                         -{product.discount}%
                       </span>
                     )}
                   </div>
                   <div className="text-center">
-                    <p className="text-[10px] sm:text-xs font-medium text-gray-700 line-clamp-1 max-w-[100px]">
+                    <p className="text-[10px] sm:text-xs text-gray-700 line-clamp-1 max-w-[100px]">
                       {truncateText(product.name, 12)}
                     </p>
                   </div>
@@ -263,7 +255,7 @@ export default function Home() {
 
             <button
               onClick={scrollRight}
-              className="absolute right-0 z-10 bg-white/90 hover:bg-white shadow-lg p-2 rounded-full transition-all duration-300 hover:scale-110 border border-gray-200"
+              className="absolute right-0 z-10 bg-white/90 hover:bg-white border border-gray-300 p-2 rounded-full transition-colors duration-300"
               aria-label="Scroll right"
             >
               <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,19 +266,17 @@ export default function Home() {
         </div>
       )}
 
-      {/* Latest Products Section - Transforms based on search */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div className="flex items-center justify-between mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          <h2 className="text-2xl sm:text-3xl text-black">
             {isSearching ? `Search Results for "${search}"` : "Latest Products"}
           </h2>
-        
         </div>
         
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <div className="w-full pt-[75%] bg-gray-200 animate-pulse"></div>
                 <div className="p-3 sm:p-4">
                   <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
@@ -302,36 +292,36 @@ export default function Home() {
                 <Link
                   key={product._id}
                   href={`/products/${product._id}`}
-                  className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-1"
+                  className="group bg-white rounded-xl border border-gray-200 hover:border-gray-400 transition-colors duration-300 overflow-hidden"
                 >
                   <div className="relative w-full pt-[75%] bg-gray-200 overflow-hidden">
                     <img
                       src={product.image || "https://via.placeholder.com/300x300/4F46E5/FFFFFF?text=Product"}
                       alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:opacity-80 transition-opacity duration-500"
                       loading="lazy"
                       onError={(e) => {
                         e.target.src = "https://via.placeholder.com/300x300/4F46E5/FFFFFF?text=Product";
                       }}
                     />
                     {product.stock <= 5 && product.stock > 0 && (
-                      <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full font-bold">
+                      <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full">
                         Low Stock
                       </span>
                     )}
                     {product.discount && (
-                      <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] px-2 py-1 rounded-full font-bold">
+                      <span className="absolute top-2 left-2 bg-green-500 text-white text-[10px] px-2 py-1 rounded-full">
                         {product.discount}% OFF
                       </span>
                     )}
                   </div>
                   <div className="p-3 sm:p-4">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {truncateText(product.name, 40)}
+                    <h3 className="text-sm sm:text-base text-black line-clamp-2 group-hover:text-gray-700 transition-colors">
+                      {truncateText(product.name, 30)}
                     </h3>
                     <div className="flex items-center justify-between mt-2">
                       <div>
-                        <p className="text-blue-600 text-lg sm:text-xl font-bold">
+                        <p className="text-gray-900 text-lg sm:text-xl">
                           ${Number(product.price).toFixed(2)}
                         </p>
                         {product.originalPrice && (
@@ -340,9 +330,7 @@ export default function Home() {
                           </p>
                         )}
                       </div>
-                     
                     </div>
-                  
                   </div>
                 </Link>
               ))
@@ -355,19 +343,17 @@ export default function Home() {
         )}
       </section>
 
-      {/* All Products Section - All products displayed without pagination */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 sm:pb-12 lg:pb-16">
         <div className="flex items-center justify-between mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          <h2 className="text-2xl sm:text-3xl text-black">
             {isSearching ? "All Results" : "All Products"}
           </h2>
-          
         </div>
         
         {loading ? (
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
               <p className="text-gray-600 text-lg">Loading products...</p>
             </div>
           </div>
@@ -378,43 +364,43 @@ export default function Home() {
                 <Link
                   key={product._id}
                   href={`/products/${product._id}`}
-                  className="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1"
+                  className="group bg-white rounded-xl border border-gray-200 hover:border-gray-400 transition-colors duration-300 overflow-hidden flex flex-col"
                 >
                   <div className="relative w-full pt-[60%] sm:pt-[65%] bg-gray-200 overflow-hidden">
                     <img
                       src={product.image || "https://via.placeholder.com/300x300/4F46E5/FFFFFF?text=Product"}
                       alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:opacity-80 transition-opacity duration-500"
                       loading="lazy"
                       onError={(e) => {
                         e.target.src = "https://via.placeholder.com/300x300/4F46E5/FFFFFF?text=Product";
                       }}
                     />
                     {product.stock <= 5 && product.stock > 0 && (
-                      <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-bold">
+                      <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-red-500 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full">
                         Low Stock
                       </span>
                     )}
                     {product.stock === 0 && (
-                      <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-gray-600 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-bold">
+                      <span className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-gray-600 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full">
                         Out of Stock
                       </span>
                     )}
                     {product.discount && (
-                      <span className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full font-bold">
+                      <span className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-green-500 text-white text-[10px] sm:text-xs px-2 py-1 rounded-full">
                         {product.discount}% OFF
                       </span>
                     )}
                   </div>
 
                   <div className="p-3 sm:p-4 md:p-5 flex flex-col flex-1">
-                    <h2 className="text-sm sm:text-base md:text-lg font-bold text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {truncateText(product.name, 50)}
+                    <h2 className="text-sm sm:text-base md:text-lg text-black leading-tight line-clamp-2 group-hover:text-gray-700 transition-colors">
+                      {truncateText(product.name, 35)}
                     </h2>
 
                     <div className="flex items-center justify-between mt-2">
                       <div>
-                        <p className="text-blue-600 text-lg sm:text-xl md:text-2xl font-bold">
+                        <p className="text-gray-900 text-lg sm:text-xl md:text-2xl">
                           ${Number(product.price).toFixed(2)}
                         </p>
                         {product.originalPrice && (
@@ -423,10 +409,7 @@ export default function Home() {
                           </p>
                         )}
                       </div>
-                     
                     </div>
-
-                    
                   </div>
                 </Link>
               ))
@@ -435,12 +418,12 @@ export default function Home() {
                 <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <h2 className="text-xl text-gray-600 font-semibold">No products found</h2>
+                <h2 className="text-xl text-gray-600">No products found</h2>
                 <p className="text-gray-400 mt-2">
                   {search ? `No results for "${search}"` : 'Try adjusting your search'}
                 </p>
                 {search && (
-                  <button onClick={() => setSearch('')} className="mt-4 text-blue-600 hover:text-blue-700 font-medium underline">
+                  <button onClick={() => setSearch('')} className="mt-4 text-gray-600 hover:text-gray-800 underline">
                     Clear search
                   </button>
                 )}

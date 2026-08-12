@@ -1,4 +1,4 @@
-const API_URL = 'https://e-commerce-3-23ca.onrender.com/api' 
+const API_URL='http://localhost:8000/api'
 
 export const createEsewaPayment = async (orderId) => {
     try {

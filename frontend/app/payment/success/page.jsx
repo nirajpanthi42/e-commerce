@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FiCheckCircle, FiLoader, FiXCircle } from 'react-icons/fi';
 
-const API_URL = "https://e-commerce-3-23ca.onrender.com/api" || 'http://localhost:8000/api';
+const API_URL ='http://localhost:8000/api';
 
 // Separate component that uses useSearchParams
 function PaymentVerification() {

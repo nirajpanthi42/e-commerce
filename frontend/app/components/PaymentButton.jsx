@@ -40,8 +40,8 @@ export default function PaymentButton({ orderId }) {
 
             // Create form programmatically
             const form = document.createElement("form");
-            form.method = "POST";
-            form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+            form.method ="POST";
+            form.action ="https://rc-epay.esewa.com.np/api/epay/main/v2/form";
 
             // Add all payment fields as hidden inputs
             Object.entries(data).forEach(([key, value]) => {
