@@ -28,7 +28,7 @@ connectDB();
 // Middleware
 app.use(
   cors({
-      origin:'e-commerce-chi-beige-40.vercel.app',
+      origin:'https://e-commerce-chi-beige-40.vercel.app',
     credentials: true,
   })
 );
