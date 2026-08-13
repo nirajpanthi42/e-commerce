@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:"e-commerce-chi-beige-40.vercel.app/api",
+  baseURL:"https://e-commerce-1-4hyu.onrender.com/api",
   headers: {
     'Content-Type': 'application/json',
   },

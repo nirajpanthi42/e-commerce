@@ -1,4 +1,4 @@
-const API_URL='e-commerce-chi-beige-40.vercel.app/api'
+const API_URL='https://e-commerce-1-4hyu.onrender.com/api'
 
 export const createEsewaPayment = async (orderId) => {
     try {
