@@ -28,8 +28,7 @@ connectDB();
 // Middleware
 app.use(
   cors({
-      origin:'https://e-commerce-theta-ruby-83.vercel.app',
-      origin:'http://localhost:3000',
+      origin:'e-commerce-chi-beige-40.vercel.app',
     credentials: true,
   })
 );

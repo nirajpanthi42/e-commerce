@@ -80,8 +80,8 @@ router.post('/esewa/create', async (req, res) => {
         };
         await order.save();
 
-        console.log('✅ eSewa payment data generated:', paymentData);
-        console.log('📦 Order details:', {
+        console.log('eSewa payment data generated:', paymentData);
+        console.log(' Order details:', {
             orderId: order._id,
             totalAmount: total_amount,
             customer: order.shippingAddress?.email || 'N/A'
@@ -90,7 +90,7 @@ router.post('/esewa/create', async (req, res) => {
         res.json(paymentData);
 
     } catch (error) {
-        console.error('❌ eSewa payment error:', error);
+        console.error(' eSewa payment error:', error);
         res.status(500).json({ 
             message: 'Payment initialization failed', 
             error: error.message 
@@ -132,7 +132,7 @@ router.post('/esewa/verify', async (req, res) => {
             };
             await order.save();
 
-            console.log('✅ Payment verified and order updated:', orderId);
+            console.log(' Payment verified and order updated:', orderId);
             
             res.json({ 
                 success: true, 
@@ -154,7 +154,7 @@ router.post('/esewa/verify', async (req, res) => {
             };
             await order.save();
 
-            console.log('❌ Payment failed for order:', orderId);
+            console.log(' Payment failed for order:', orderId);
             
             res.json({ 
                 success: false, 
@@ -163,7 +163,7 @@ router.post('/esewa/verify', async (req, res) => {
         }
 
     } catch (error) {
-        console.error('❌ Payment verification error:', error);
+        console.error(' Payment verification error:', error);
         res.status(500).json({ 
             message: 'Payment verification failed', 
             error: error.message 
@@ -193,7 +193,7 @@ router.get('/esewa/status/:orderId', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Payment status check error:', error);
+        console.error(' Payment status check error:', error);
         res.status(500).json({ 
             message: 'Failed to check payment status', 
             error: error.message 

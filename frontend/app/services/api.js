@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:"http://localhost:8000/api",
+  baseURL:"e-commerce-chi-beige-40.vercel.app/api",
   headers: {
     'Content-Type': 'application/json',
   },

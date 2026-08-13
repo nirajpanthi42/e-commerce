@@ -1,4 +1,4 @@
-const API_URL='http://localhost:8000/api'
+const API_URL='e-commerce-chi-beige-40.vercel.app/api'
 
 export const createEsewaPayment = async (orderId) => {
     try {
